@@ -40,24 +40,24 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# DATOS DE RESPALDO: COHORTE OFICIAL (11/06/2026 - 10:00:25 a. m.)
+# DATOS DE RESPALDO: COHORTE OFICIAL (11/06/2026 - 12:20:18 p. m.)
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 98.216  
-observadas_jee = 1635     # Actas derivadas al Jurado Electoral Especial
-pendientes = 20          # Actas físicas pendientes de procesamiento
-corte_temporal = "11/06/2026 10:00:25 a. m."
+procesadas_porc = 98.230  
+observadas_jee = 1629     # Actas derivadas al Jurado Electoral Especial
+pendientes = 13           # Actas físicas pendientes de procesamiento
+corte_temporal = "11/06/2026 12:20:18 p. m."
 
 candidatos = [
-    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9032653, "porcentaje": 50.002},
-    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9032092, "porcentaje": 49.998}
+    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9033584, "porcentaje": 50.003},
+    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9032662, "porcentaje": 49.997}
 ]
 
 # Control de Inyección Dinámica
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 98.216))
-        observadas_jee = int(json_data.get("totales_observadas", 1635))
+        procesadas_porc = float(json_data.get("porcentajepros", 98.230))
+        observadas_jee = int(json_data.get("totales_observadas", 1629))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
@@ -92,8 +92,8 @@ diferencia_absoluta = primero["votos"] - segundo["votos"]
 ahora = datetime.datetime.now()
 data_historica = {
     "Hora": [(ahora - datetime.timedelta(hours=i)).strftime("%H:%M") for i in range(5, -1, -1)],
-    primero["nombre"]: [primero["votos"]-400, primero["votos"]-250, primero["votos"]-150, primero["votos"]-80, primero["votos"]-30, primero["votos"]],
-    segundo["nombre"]: [segundo["votos"]-390, segundo["votos"]-245, segundo["votos"]-148, segundo["votos"]-75, segundo["votos"]-28, segundo["votos"]]
+    primero["nombre"]: [primero["votos"]-600, primero["votos"]-400, primero["votos"]-300, primero["votos"]-150, primero["votos"]-50, primero["votos"]],
+    segundo["nombre"]: [segundo["votos"]-580, segundo["votos"]-390, segundo["votos"]-280, segundo["votos"]-140, segundo["votos"]-45, segundo["votos"]]
 }
 df_evolucion = pd.DataFrame(data_historica).set_index("Hora")
 
