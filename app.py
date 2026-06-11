@@ -42,32 +42,33 @@ json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 # ==============================================================================
 # PIPELINE HISTÓRICO REAL (PERSISTENCIA DE SESIÓN)
 # ==============================================================================
-# Inicialización de la serie cronológica con el nuevo hito de las 12:30 p. m.
+# Inicialización de la serie cronológica indexando el nuevo corte de las 13:05
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Hora": "09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
         {"Hora": "10:00", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
         {"Hora": "12:20", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
-        {"Hora": "12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922}
+        {"Hora": "12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
+        {"Hora": "13:05", "Keiko": 9033680, "Roberto": 9032774, "Diferencia Absoluta": 906}
     ])
 
-# Datos de contingencia actuales (Matriz oficial indexada)
+# Datos de contingencia actuales (Indexación exacta según corte oficial)
 total_actas = 92766
-procesadas_porc = 98.230  
-observadas_jee = 1629     
+procesadas_porc = 98.231  
+observadas_jee = 1628     
 pendientes = 13           
-corte_temporal = "11/06/2026 12:30:25 p. m."
+corte_temporal = "11/06/2026 01:05:18 p. m."
 
 candidatos = [
-    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9033584, "porcentaje": 50.003},
-    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9032662, "porcentaje": 49.997}
+    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9033680, "porcentaje": 50.003},
+    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9032774, "porcentaje": 49.997}
 ]
 
 # Control de Inyección Dinámica
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 98.230))
-        observadas_jee = int(json_data.get("totales_observadas", 1629))
+        procesadas_porc = float(json_data.get("porcentajepros", 98.231))
+        observadas_jee = int(json_data.get("totales_observadas", 1628))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
@@ -83,7 +84,7 @@ if status_msg == "OK" and json_data:
             corte_temporal = "Sincronizado en Tiempo Real"
             st.sidebar.success("📊 Sincronización Real-Time Activa.")
             
-            # Guardas de consistencia: Evita duplicar registros si los votos no mutan en el scraping en vivo
+            # Guardas de consistencia para el ledger histórico dinámico
             df_actual = st.session_state.registro_historico
             if not df_actual.empty and df_actual.iloc[-1]["Keiko"] != votos_k:
                 hora_actual = datetime.datetime.now().strftime("%H:%M")
