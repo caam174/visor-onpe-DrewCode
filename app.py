@@ -42,7 +42,7 @@ json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 # ==============================================================================
 # PIPELINE HISTÓRICO REAL (PERSISTENCIA DE SESIÓN)
 # ==============================================================================
-# Inicialización de la serie cronológica incorporando la meseta temporal de las 14:40
+# Serie cronológica indexada que incluye la validación de la meseta temporal (image_d9dd66.jpg)
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Hora": "09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
@@ -55,7 +55,7 @@ if "registro_historico" not in st.session_state:
         {"Hora": "14:40", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859}
     ])
 
-# Datos de contingencia actuales basados estrictamente en image_d9e14e.jpg
+# Datos de contingencia actuales basados estrictamente en image_d9dd66.jpg
 total_actas = 92766
 procesadas_porc = 98.236  
 observadas_jee = 1623     
