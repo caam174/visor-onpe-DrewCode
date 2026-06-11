@@ -42,27 +42,28 @@ json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 # ==============================================================================
 # PIPELINE HISTÓRICO REAL (PERSISTENCIA DE SESIÓN)
 # ==============================================================================
-# Inicialización del registro indexado con los cortes oficiales provistos
+# Inicialización de la serie cronológica con el nuevo hito de las 12:30 p. m.
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Hora": "09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
         {"Hora": "10:00", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
-        {"Hora": "12:20", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922}
+        {"Hora": "12:20", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
+        {"Hora": "12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922}
     ])
 
-# Datos de contingencia actuales (Último corte disponible de la ONPE)
+# Datos de contingencia actuales (Matriz oficial indexada)
 total_actas = 92766
 procesadas_porc = 98.230  
 observadas_jee = 1629     
 pendientes = 13           
-corte_temporal = "11/06/2026 12:20:18 p. m."
+corte_temporal = "11/06/2026 12:30:25 p. m."
 
 candidatos = [
     {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9033584, "porcentaje": 50.003},
     {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9032662, "porcentaje": 49.997}
 ]
 
-# Inyección Dinámica y Actualización Automática del Histórico
+# Control de Inyección Dinámica
 if status_msg == "OK" and json_data:
     try:
         procesadas_porc = float(json_data.get("porcentajepros", 98.230))
@@ -82,7 +83,7 @@ if status_msg == "OK" and json_data:
             corte_temporal = "Sincronizado en Tiempo Real"
             st.sidebar.success("📊 Sincronización Real-Time Activa.")
             
-            # Monitoreo de cambios: Si el nuevo dato difiere del último guardado, se anexa
+            # Guardas de consistencia: Evita duplicar registros si los votos no mutan en el scraping en vivo
             df_actual = st.session_state.registro_historico
             if not df_actual.empty and df_actual.iloc[-1]["Keiko"] != votos_k:
                 hora_actual = datetime.datetime.now().strftime("%H:%M")
@@ -100,7 +101,7 @@ else:
     st.sidebar.warning("⚠️ Modo Contingencia Activo")
     st.sidebar.code(status_msg, language="text")
 
-# 2. Lógica de Negocio: Ordenamiento
+# 2. Lógica del Modelo Analítico
 candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True)
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
@@ -112,7 +113,7 @@ diferencia_actual = primero["votos"] - segundo["votos"]
 
 st.sidebar.info(f"Último corte cargado: {corte_temporal}")
 
-## SECCIÓN I: MARGEN DE POSICIONES
+## SECCIÓN I: MARGEN DE POSICIONES LITERALES
 st.markdown("### 🥇 ESTADO DE LA CONTIENDA (VOTOS VÁLIDOS EMITIDOS)")
 col_1er, col_2do = st.columns(2)
 
@@ -128,7 +129,7 @@ with col_2do:
 
 st.markdown("---")
 
-## SECCIÓN II: MARGEN DE CONTROL
+## SECCIÓN II: INDICADORES ESTRUCTURALES Y MARGEN DE CONTROL
 st.markdown("### ⚖️ MARGEN DE CONTROL")
 col_dif, col_actas = st.columns([2, 1])
 
@@ -167,7 +168,7 @@ with col_graph1:
 with col_graph2:
     st.markdown("#### 📈 Evolución Real de la Diferencia Absoluta (Brecha de Ventaja)")
     
-    # Renderizado del gráfico lineal usando la data cronológica real de las capturas
+    # Renderizado lineal del comportamiento de la brecha
     fig_linea_diff = px.line(
         st.session_state.registro_historico,
         x="Hora",
@@ -177,7 +178,6 @@ with col_graph2:
         labels={"Diferencia Absoluta": "Margen de Votos", "Hora": "Hora del Corte"}
     )
     
-    # Estilización con rigor de ingeniería (Línea de alerta roja institucional)
     fig_linea_diff.update_traces(
         line_color="#E74C3C", 
         line_width=3, 
@@ -187,10 +187,10 @@ with col_graph2:
     fig_linea_diff.update_layout(
         margin=dict(t=20, b=20, l=20, r=20),
         height=320,
-        xaxis=dict(type='category') # Garantiza secuencia lineal discreta de los cortes
+        xaxis=dict(type='category')
     )
     st.plotly_chart(fig_linea_diff, use_container_width=True)
 
-# 4. Ciclo Automatizado de Refresco
+# 4. Ciclo Automatizado de Refresco (Frecuencia: 60s)
 time.sleep(60)
 st.rerun()
