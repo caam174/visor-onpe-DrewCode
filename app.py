@@ -42,7 +42,7 @@ json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 # ==============================================================================
 # PIPELINE HISTÓRICO REAL (PERSISTENCIA DE SESIÓN)
 # ==============================================================================
-# Inicialización de la serie cronológica incluyendo el corte de las 13:35 de image_dba83f.jpg
+# Inicialización de la serie cronológica incorporando la meseta temporal de las 14:40
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Hora": "09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
@@ -51,15 +51,16 @@ if "registro_historico" not in st.session_state:
         {"Hora": "12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
         {"Hora": "13:05", "Keiko": 9033680, "Roberto": 9032774, "Diferencia Absoluta": 906},
         {"Hora": "13:12", "Keiko": 9033756, "Roberto": 9032886, "Diferencia Absoluta": 870},
-        {"Hora": "13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859}
+        {"Hora": "13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
+        {"Hora": "14:40", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859}
     ])
 
-# Datos de contingencia actuales basados en el corte de las 13:35:18 p. m.
+# Datos de contingencia actuales basados estrictamente en image_d9e14e.jpg
 total_actas = 92766
 procesadas_porc = 98.236  
 observadas_jee = 1623     
 pendientes = 13           
-corte_temporal = "11/06/2026 01:35:18 p. m."
+corte_temporal = "11/06/2026 02:40:25 p. m."
 
 candidatos = [
     {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9034070, "porcentaje": 50.002},
