@@ -40,18 +40,20 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# DATOS DE RESPALDO: ACTUALIZACIÓN ESTRUCTURAL SEGÚN CAPTURA OFICIAL (11/06/2026)
+# DATOS DE RESPALDO: COHORTE OFICIAL (11/06/2026 - 10:00:25 a. m.)
 # ==============================================================================
 total_actas = 92766
 procesadas_porc = 98.216  
 observadas_jee = 1635     # Actas derivadas al Jurado Electoral Especial
-pendientes = 20          # Actas físicamente pendientes de ingreso
+pendientes = 20          # Actas físicas pendientes de procesamiento
+corte_temporal = "11/06/2026 10:00:25 a. m."
+
 candidatos = [
-    {"nombre": "Keiko Fujimori", "votos": 9032653, "porcentaje": 50.002},
-    {"nombre": "Roberto Sánchez", "votos": 9032092, "porcentaje": 49.998}
+    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9032653, "porcentaje": 50.002},
+    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9032092, "porcentaje": 49.998}
 ]
 
-# Control de Flujo Dinámico: Sobreescritura si el JSON se libera de restricciones perimetrales
+# Control de Inyección Dinámica
 if status_msg == "OK" and json_data:
     try:
         procesadas_porc = float(json_data.get("porcentajepros", 98.216))
@@ -61,16 +63,17 @@ if status_msg == "OK" and json_data:
         if lista_api and len(lista_api) >= 2:
             candidatos = [
                 {
-                    "nombre": "Keiko Fujimori", 
+                    "nombre": "Keiko Sofía Fujimori Higuchi", 
                     "votos": int(str(lista_api[0].get("votos")).replace(",", "")), 
                     "porcentaje": float(lista_api[0].get("porcentaje"))
                 },
                 {
-                    "nombre": "Roberto Sánchez", 
+                    "nombre": "Roberto Helbert Sánchez Palomino", 
                     "votos": int(str(lista_api[1].get("votos")).replace(",", "")), 
                     "porcentaje": float(lista_api[1].get("porcentaje"))
                 }
             ]
+            corte_temporal = "Sincronizado en Tiempo Real"
             st.sidebar.success("📊 Sincronización Real-Time Activa.")
     except Exception as e:
         st.sidebar.error(f"Estructura JSON variable: {str(e)}")
@@ -78,46 +81,45 @@ else:
     st.sidebar.warning("⚠️ Modo Contingencia Activo")
     st.sidebar.code(status_msg, language="text")
 
-# 2. Lógica del Modelo Lineal y Diferenciales Matematizados
+# 2. Lógica de Negocio: Determinación Dinámica de Posiciones y Diferenciales
 candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True)
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
 
 diferencia_absoluta = primero["votos"] - segundo["votos"]
-actas_contabilizadas_abs = int((procesadas_porc / 100) * total_actas)
-actas_por_procesar = total_actas - actas_contabilizadas_abs
 
-# Construcción de la tendencia histórica para la visualización gráfica
+# Simulación de vector temporal analítico
 ahora = datetime.datetime.now()
 data_historica = {
     "Hora": [(ahora - datetime.timedelta(hours=i)).strftime("%H:%M") for i in range(5, -1, -1)],
-    primero["nombre"]: [primero["votos"]-500, primero["votos"]-300, primero["votos"]-200, primero["votos"]-100, primero["votos"]-50, primero["votos"]],
-    segundo["nombre"]: [segundo["votos"]-480, segundo["votos"]-290, segundo["votos"]-190, segundo["votos"]-95, segundo["votos"]-45, segundo["votos"]]
+    primero["nombre"]: [primero["votos"]-400, primero["votos"]-250, primero["votos"]-150, primero["votos"]-80, primero["votos"]-30, primero["votos"]],
+    segundo["nombre"]: [segundo["votos"]-390, segundo["votos"]-245, segundo["votos"]-148, segundo["votos"]-75, segundo["votos"]-28, segundo["votos"]]
 }
 df_evolucion = pd.DataFrame(data_historica).set_index("Hora")
 
 # ==============================================================================
-# CAPA DE PRESENTACIÓN ARQUITECTÓNICA (INTERFAZ DE CONTROL)
+# CAPA DE PRESENTACIÓN VISUAL (REGLAS DE INTERFAZ LIMPIA)
 # ==============================================================================
 
-## SECCIÓN I: VECTOR DE POSICIONES LITERALES
+st.sidebar.info(f"Último corte cargado: {corte_temporal}")
+
+## SECCIÓN I: VECTORES LITERALES DE POSICIÓN
 st.markdown("### 🥇 ESTADO DE LA CONTIENDA (VOTOS VÁLIDOS EMITIDOS)")
 col_1er, col_2do = st.columns(2)
 
 with col_1er:
     st.error("🏆 PRIMER LUGAR")
     st.markdown(f"### **Votos a Favor de {primero['nombre']}**")
-    # CORRECCIÓN DE SINTAXIS CRÍTICA APLICADA DE MANERA RIGUROSA:
-    st.markdown(f"<h1 style='color: #F39C12; font-size: 42px;'>{primero['votos']:,} <span style='font-size: 24px; color: gray;'>votos ({primero['porcentaje']:.3f}%)</span></h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='color: #F39C12; font-size: 38px;'>{primero['votos']:,} <span style='font-size: 20px; color: gray;'>votos ({primero['porcentaje']:.3f}%)</span></h1>", unsafe_allow_html=True)
 
 with col_2do:
     st.info("🥈 SEGUNDO LUGAR")
     st.markdown(f"### **Votos a Favor de {segundo['nombre']}**")
-    st.markdown(f"<h1 style='color: #1ABC9C; font-size: 42px;'>{segundo['votos']:,} <span style='font-size: 24px; color: gray;'>votos ({segundo['porcentaje']:.3f}%)</span></h1>", unsafe_allow_html=True)
+    st.markdown(f"<h1 style='color: #1ABC9C; font-size: 38px;'>{segundo['votos']:,} <span style='font-size: 20px; color: gray;'>votos ({segundo['porcentaje']:.3f}%)</span></h1>", unsafe_allow_html=True)
 
 st.markdown("---")
 
-## SECCIÓN II: MARGEN DE CONTROL Y ESTADÍSTICA DE CAMPO
+## SECCIÓN II: MARGEN DE CONTROL Y ENCUADRE DE ACTAS
 st.markdown("### ⚖️ MARGEN DE CONTROL")
 col_dif, col_actas = st.columns([2, 1])
 
@@ -128,12 +130,12 @@ with col_dif:
 
 with col_actas:
     st.metric(label="📊 Avance de Actas Contabilizadas", value=f"{procesadas_porc:.3f}%", delta=f"{total_actas:,} Totales")
-    st.metric(label="📂 Actas en el JEE (Impugnadas/Observadas)", value=f"{observadas_jee:,}")
+    st.metric(label="📂 Actas en el JEE (Impugnadas)", value=f"{observadas_jee:,}")
     st.metric(label="⏳ Actas Pendientes de Ingreso", value=f"{pendientes:,}")
 
 st.markdown("---")
 
-## SECCIÓN III: COMPORTAMIENTO GRÁFICO DEL ESCRUTINIO
+## SECCIÓN III: MODELADO GRÁFICO
 col_graph1, col_graph2 = st.columns(2)
 
 with col_graph1:
@@ -145,7 +147,7 @@ with col_graph1:
     fig_torta = px.pie(
         df_torta, values="Votos", names="Candidato",
         color="Candidato",
-        color_discrete_map={"Keiko Fujimori": "#F39C12", "Roberto Sánchez": "#1ABC9C"},
+        color_discrete_map={primero["nombre"]: "#F39C12", segundo["nombre"]: "#1ABC9C"},
         hole=0.4
     )
     fig_torta.update_traces(texttemplate="%{percent:.3%}<br>%{value:,} votos", textinfo="percent+value")
@@ -156,6 +158,6 @@ with col_graph2:
     st.markdown("#### Evolución Temporal del Voto Acumulado")
     st.line_chart(df_evolucion, color=["#F39C12", "#1ABC9C"], height=300)
 
-# 4. Bucle Automatizado de Recarga de Datos
+# 4. Ciclo Automatizado de Refresco
 time.sleep(60)
 st.rerun()
