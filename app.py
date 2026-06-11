@@ -43,8 +43,8 @@ json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 # DATOS DE RESPALDO ACTUALIZADOS SEGÚN CAPTURA OFICIAL
 # =========================================================
 total_actas = 86488
-procesadas_porc = 99.985  # Ajustado al nivel de avance del conteo final
-observadas = 124          # Margen remanente estimado
+procesadas_porc = 99.985  
+observadas = 124          
 candidatos = [
     {"nombre": "Keiko Fujimori", "votos": 9032653, "porcentaje": 50.002},
     {"nombre": "Roberto Sánchez", "votos": 9032092, "porcentaje": 49.998}
@@ -121,7 +121,8 @@ col_dif, col_actas = st.columns([2, 1])
 
 with col_dif:
     st.subheader("Diferencia Absoluta de Votos")
-    st.markdown(f"<p style='font-size: 48px; font-weight: bold; color: #E74C3C; margin: 0;'>{diferencia_absolute: , if 'diferencia_absoluta' in locals() else diferencia_absoluta:,} <span style='font-size: 20px; font-weight: normal; color: gray;'>votos de ventaja</span></p>", unsafe_allow_html=True)
+    # CORRECCIÓN DE SINTAXIS EN LA VARIABLE DE CONTROL:
+    st.markdown(f"<p style='font-size: 48px; font-weight: bold; color: #E74C3C; margin: 0;'>{diferencia_absoluta:,} <span style='font-size: 20px; font-weight: normal; color: gray;'>votos de ventaja</span></p>", unsafe_allow_html=True)
     st.caption(f"Brecha matemática actual del primer lugar sobre el segundo lugar ({primero['nombre']} vs {segundo['nombre']}).")
 
 with col_actas:
