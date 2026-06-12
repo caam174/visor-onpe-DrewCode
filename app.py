@@ -8,7 +8,7 @@ import time
 # 1. Configuración de la Infraestructura de la Página
 st.set_page_config(page_title="Control de Escrutinio ONPE", layout="wide")
 
-# Inyección de Firma de Autoría en la Esquina Superior Derecho (CMU Font, Azul Marino, Negrita)
+# Inyección de Firma de Autoría en la Esquina Superior Derecha (CMU Font, Azul Marino, Negrita)
 st.markdown(
     """
     <div style="text-align: right; color: #000080; font-family: 'CMU Serif', 'Computer Modern', 'Times New Roman', serif; font-weight: bold; font-size: 13px; margin-bottom: -25px; padding-right: 5px;">
@@ -52,23 +52,24 @@ json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 # ==============================================================================
 # PIPELINE HISTÓRICO REAL (PERSISTENCIA DE SESIÓN)
 # ==============================================================================
+# Corrección del vector temporal incorporando la estandarización DD/MM HH:MM
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
-        {"Hora": "09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
-        {"Hora": "10:00", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
-        {"Hora": "12:20", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
-        {"Hora": "12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
-        {"Hora": "13:05", "Keiko": 9033680, "Roberto": 9032774, "Diferencia Absoluta": 906},
-        {"Hora": "13:12", "Keiko": 9033756, "Roberto": 9032886, "Diferencia Absoluta": 870},
-        {"Hora": "13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
-        {"Hora": "14:40", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
-        {"Hora": "15:00", "Keiko": 9034071, "Roberto": 9033212, "Diferencia Absoluta": 859},
-        {"Hora": "19:05", "Keiko": 9035493, "Roberto": 9034466, "Diferencia Absoluta": 1027},
-        {"Hora": "07:55 (12)", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
-        {"Hora": "08:00 (12)", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303}
+        {"Corte": "11/06 09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
+        {"Corte": "11/06 10:00", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
+        {"Corte": "11/06 12:20", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
+        {"Corte": "11/06 12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
+        {"Corte": "11/06 13:05", "Keiko": 9033680, "Roberto": 9032774, "Diferencia Absoluta": 906},
+        {"Corte": "11/06 13:12", "Keiko": 9033756, "Roberto": 9032886, "Diferencia Absoluta": 870},
+        {"Corte": "11/06 13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
+        {"Corte": "11/06 14:40", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
+        {"Corte": "11/06 15:00", "Keiko": 9034071, "Roberto": 9033212, "Diferencia Absoluta": 859},
+        {"Corte": "11/06 19:05", "Keiko": 9035493, "Roberto": 9034466, "Diferencia Absoluta": 1027},
+        {"Corte": "12/06 07:55", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
+        {"Corte": "12/06 08:00", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303}
     ])
 
-# Parámetros nominales de contingencia
+# Parámetros nominales de contingencia actualizados según image_8458fd.jpg
 total_actas = 92766
 procesadas_porc = 98.258  
 observadas_jee = 1607     
@@ -100,11 +101,12 @@ if status_msg == "OK" and json_data:
             corte_temporal = "Sincronizado en Tiempo Real"
             st.sidebar.success("📊 Sincronización Real-Time Activa.")
             
+            # Guardas de consistencia formateando también la inyección viva con día y mes
             df_actual = st.session_state.registro_historico
             if not df_actual.empty and df_actual.iloc[-1]["Keiko"] != votos_k:
-                hora_actual = datetime.datetime.now().strftime("%H:%M")
+                fecha_hora_viva = datetime.datetime.now().strftime("%d/%m %H:%M")
                 nueva_fila = pd.DataFrame([{
-                    "Hora": hora_actual, 
+                    "Corte": fecha_hora_viva, 
                     "Keiko": votos_k, 
                     "Roberto": votos_r, 
                     "Diferencia Absoluta": abs(votos_k - votos_r)
@@ -184,13 +186,14 @@ with col_graph1:
 with col_graph2:
     st.markdown("#### 📈 Evolución Real de la Diferencia Absoluta (Brecha de Ventaja)")
     
+    # Eje X actualizado apuntando a 'Corte' con formato limpio DD/MM HH:MM
     fig_linea_diff = px.line(
         st.session_state.registro_historico,
-        x="Hora",
+        x="Corte",
         y="Diferencia Absoluta",
         markers=True,
         text="Diferencia Absoluta",
-        labels={"Diferencia Absoluta": "Margen de Votos", "Hora": "Hora del Corte"}
+        labels={"Diferencia Absoluta": "Margen de Votos", "Corte": "Fecha y Hora del Corte"}
     )
     
     fig_linea_diff.update_traces(
