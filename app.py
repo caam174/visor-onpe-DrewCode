@@ -1,3 +1,11 @@
+Código fuente actualizado para reflejar el corte oficial de la ONPE registrado en image_8458fd.jpg, emitido a las 08:00:26 a. m. del 12/06/2026.
+
+Desde una perspectiva analítica de control de procesos, este hito de control muestra una meseta temporal de cortísimo plazo en comparación con el reporte de las 07:55 a. m. El avance de actas contabilizadas se estabiliza de momento en 98.258%, reteniendo exactamente el mismo inventario de actas en el JEE (1,607) y la misma cantidad de pendientes (9). Consecuentemente, el diferencial neto se mantiene sin variación marginal en 1,303 votos. Este nuevo punto ha sido indexado en la serie histórica para dar continuidad cronológica y graficar fielmente el comportamiento del flujo de datos en tiempo real.
+
+Se preserva de manera estricta el bloque superior derecho de autoría institucional personalizado con la tipografía e instrucciones de estilo solicitadas.
+
+Código Fuente Actualizado (app.py)
+Python
 import streamlit as st
 import pandas as pd
 import plotly.express as px
@@ -8,7 +16,7 @@ import time
 # 1. Configuración de la Infraestructura de la Página
 st.set_page_config(page_title="Control de Escrutinio ONPE", layout="wide")
 
-# Inyección de Firma de Autoría en la Esquina Superior Derecha
+# Inyección de Firma de Autoría en la Esquina Superior Derecha (CMU Font, Azul Marino, Negrita)
 st.markdown(
     """
     <div style="text-align: right; color: #000080; font-family: 'CMU Serif', 'Computer Modern', 'Times New Roman', serif; font-weight: bold; font-size: 13px; margin-bottom: -25px; padding-right: 5px;">
@@ -52,7 +60,7 @@ json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 # ==============================================================================
 # PIPELINE HISTÓRICO REAL (PERSISTENCIA DE SESIÓN)
 # ==============================================================================
-# Matriz cronológica secuencial vinculada a image_84687e.jpg
+# Incorporación secuencial del corte de las 08:00 a. m. del 12/06 basado en image_8458fd.jpg
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Hora": "09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
@@ -65,15 +73,16 @@ if "registro_historico" not in st.session_state:
         {"Hora": "14:40", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
         {"Hora": "15:00", "Keiko": 9034071, "Roberto": 9033212, "Diferencia Absoluta": 859},
         {"Hora": "19:05", "Keiko": 9035493, "Roberto": 9034466, "Diferencia Absoluta": 1027},
-        {"Hora": "07:55 (12)", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303}
+        {"Hora": "07:55 (12)", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
+        {"Hora": "08:00 (12)", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303}
     ])
 
-# Datos estáticos del reporte matutino oficial
+# Parámetros nominales de contingencia actualizados según la captura image_8458fd.jpg
 total_actas = 92766
 procesadas_porc = 98.258  
 observadas_jee = 1607     
 pendientes = 9            
-corte_temporal = "12/06/2026 07:55:18 a. m."
+corte_temporal = "12/06/2026 08:00:26 a. m."
 
 candidatos = [
     {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9036046, "porcentaje": 50.004},
@@ -100,7 +109,7 @@ if status_msg == "OK" and json_data:
             corte_temporal = "Sincronizado en Tiempo Real"
             st.sidebar.success("📊 Sincronización Real-Time Activa.")
             
-            # Guardas de consistencia para el ledger histórico dinámico
+            # Guardas de consistencia para la matriz histórica
             df_actual = st.session_state.registro_historico
             if not df_actual.empty and df_actual.iloc[-1]["Keiko"] != votos_k:
                 hora_actual = datetime.datetime.now().strftime("%H:%M")
