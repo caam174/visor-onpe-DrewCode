@@ -8,6 +8,16 @@ import time
 # 1. Configuración de la Infraestructura de la Página
 st.set_page_config(page_title="Control de Escrutinio ONPE", layout="wide")
 
+# Inyección de Firma de Autoría en la Esquina Superior Derecha
+st.markdown(
+    """
+    <div style="text-align: right; color: #000080; font-family: 'CMU Serif', 'Computer Modern', 'Times New Roman', serif; font-weight: bold; font-size: 13px; margin-bottom: -25px; padding-right: 5px;">
+        Elaborado por DrewCode - 2026. Cualquier consulta puedes escribirme a caam174@gmail.com
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 st.title("🏛️ Tablero de Control de Escrutinio Oficial (EN VIVO)")
 st.caption("Filtro de precisión analítica con actualización cada 60 segundos")
 st.markdown("---")
@@ -42,7 +52,7 @@ json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 # ==============================================================================
 # PIPELINE HISTÓRICO REAL (PERSISTENCIA DE SESIÓN)
 # ==============================================================================
-# Inclusión del nuevo punto crítico de las 19:05 extraído de image_bf838b.jpg
+# Matriz cronológica secuencial vinculada a image_84687e.jpg
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Hora": "09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
@@ -54,26 +64,27 @@ if "registro_historico" not in st.session_state:
         {"Hora": "13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
         {"Hora": "14:40", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
         {"Hora": "15:00", "Keiko": 9034071, "Roberto": 9033212, "Diferencia Absoluta": 859},
-        {"Hora": "19:05", "Keiko": 9035493, "Roberto": 9034466, "Diferencia Absoluta": 1027}
+        {"Hora": "19:05", "Keiko": 9035493, "Roberto": 9034466, "Diferencia Absoluta": 1027},
+        {"Hora": "07:55 (12)", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303}
     ])
 
-# Datos estáticos actuales basados estrictamente en el último corte visualizado
+# Datos estáticos del reporte matutino oficial
 total_actas = 92766
-procesadas_porc = 98.254  
-observadas_jee = 1611     
+procesadas_porc = 98.258  
+observadas_jee = 1607     
 pendientes = 9            
-corte_temporal = "11/06/2026 07:05:25 p. m."
+corte_temporal = "12/06/2026 07:55:18 a. m."
 
 candidatos = [
-    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9035493, "porcentaje": 50.003},
-    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9034466, "porcentaje": 49.997}
+    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9036046, "porcentaje": 50.004},
+    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9034743, "porcentaje": 49.996}
 ]
 
 # Control de Inyección Dinámica
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 98.254))
-        observadas_jee = int(json_data.get("totales_observadas", 1611))
+        procesadas_porc = float(json_data.get("porcentajepros", 98.258))
+        observadas_jee = int(json_data.get("totales_observadas", 1607))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
