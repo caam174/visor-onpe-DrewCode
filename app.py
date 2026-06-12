@@ -52,7 +52,7 @@ json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 # ==============================================================================
 # PIPELINE HISTÓRICO REAL (PERSISTENCIA DE SESIÓN)
 # ==============================================================================
-# Corrección del vector temporal incorporando la estandarización DD/MM HH:MM
+# Se incorpora el nuevo punto de control de las 08:30 al registro secuencial
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Corte": "11/06 09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
@@ -66,15 +66,16 @@ if "registro_historico" not in st.session_state:
         {"Corte": "11/06 15:00", "Keiko": 9034071, "Roberto": 9033212, "Diferencia Absoluta": 859},
         {"Corte": "11/06 19:05", "Keiko": 9035493, "Roberto": 9034466, "Diferencia Absoluta": 1027},
         {"Corte": "12/06 07:55", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
-        {"Corte": "12/06 08:00", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303}
+        {"Corte": "12/06 08:00", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
+        {"Corte": "12/06 08:30", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303}
     ])
 
-# Parámetros nominales de contingencia actualizados según image_8458fd.jpg
+# Parámetros nominales de contingencia actualizados según image_79eb9b.jpg
 total_actas = 92766
 procesadas_porc = 98.258  
 observadas_jee = 1607     
 pendientes = 9            
-corte_temporal = "12/06/2026 08:00:26 a. m."
+corte_temporal = "12/06/2026 08:30:19 a. m."
 
 candidatos = [
     {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9036046, "porcentaje": 50.004},
@@ -101,7 +102,6 @@ if status_msg == "OK" and json_data:
             corte_temporal = "Sincronizado en Tiempo Real"
             st.sidebar.success("📊 Sincronización Real-Time Activa.")
             
-            # Guardas de consistencia formateando también la inyección viva con día y mes
             df_actual = st.session_state.registro_historico
             if not df_actual.empty and df_actual.iloc[-1]["Keiko"] != votos_k:
                 fecha_hora_viva = datetime.datetime.now().strftime("%d/%m %H:%M")
@@ -186,7 +186,6 @@ with col_graph1:
 with col_graph2:
     st.markdown("#### 📈 Evolución Real de la Diferencia Absoluta (Brecha de Ventaja)")
     
-    # Eje X actualizado apuntando a 'Corte' con formato limpio DD/MM HH:MM
     fig_linea_diff = px.line(
         st.session_state.registro_historico,
         x="Corte",
