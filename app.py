@@ -5,10 +5,12 @@ import requests
 import datetime
 import time
 
-# 1. Configuración de la Infraestructura de la Página
+# ==============================================================================
+# 1. CONFIGURACIÓN DE INFRAESTRUCTURA Y ENTIDAD VISUAL
+# ==============================================================================
 st.set_page_config(page_title="Control de Escrutinio ONPE", layout="wide")
 
-# Inyección de Firma de Autoría en la Esquina Superior Derecha (CMU Font, Azul Marino, Negrita)
+# Firma de autoría institucional indexada en el margen superior derecho
 st.markdown(
     """
     <div style="text-align: right; color: #000080; font-family: 'CMU Serif', 'Computer Modern', 'Times New Roman', serif; font-weight: bold; font-size: 13px; margin-bottom: -25px; padding-right: 5px;">
@@ -19,10 +21,10 @@ st.markdown(
 )
 
 st.title("🏛️ Tablero de Control de Escrutinio Oficial (EN VIVO)")
-st.caption("Filtro de precisión analítica con actualización cada 60 segundos")
+st.caption("Filtro de precisión analítica con actualización recursiva cada 60 segundos")
 st.markdown("---")
 
-# URL del Backend de la ONPE
+# Endpoint oficial de contingencia (reglas de juego de la API de la ONPE)
 ONPE_API_REAL = "https://resultadosegundavuelta.onpe.gob.pe/presentacion-backend/resumen/resumenPresidencial"
 
 st.sidebar.header("🛠️ Estado del Pipeline de Datos")
@@ -50,43 +52,43 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# PIPELINE HISTÓRICO REAL (PERSISTENCIA DE SESIÓN)
+# 2. VECTOR HISTÓRICO DE AUDITORÍA ELECTORAL (SECUENCIA COMPLETA)
 # ==============================================================================
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Corte": "11/06 09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
         {"Corte": "11/06 10:00", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
-        {"Corte": "11/06 12:20", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
         {"Corte": "11/06 12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
         {"Corte": "11/06 13:05", "Keiko": 9033680, "Roberto": 9032774, "Diferencia Absoluta": 906},
-        {"Corte": "11/06 13:12", "Keiko": 9033584, "Roberto": 9032886, "Diferencia Absoluta": 870},
+        {"Corte": "11/06 13:12", "Keiko": 9033756, "Roberto": 9032886, "Diferencia Absoluta": 870},
         {"Corte": "11/06 13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
         {"Corte": "11/06 14:40", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
-        {"Corte": "11/06 15:00", "Keiko": 9034071, "Roberto": 9033212, "Diferencia Absoluta": 859},
+        {"Corte": "11/06 15:00", "Keiko": 9034071, "Roberto": 9033312, "Diferencia Absoluta": 759},
         {"Corte": "11/06 19:05", "Keiko": 9035493, "Roberto": 9034466, "Diferencia Absoluta": 1027},
         {"Corte": "12/06 07:55", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
         {"Corte": "12/06 08:00", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
         {"Corte": "12/06 08:30", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
-        {"Corte": "12/06 09:40", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303}
+        {"Corte": "12/06 09:40", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
+        {"Corte": "12/06 14:55", "Keiko": 9037650, "Roberto": 9036099, "Diferencia Absoluta": 1551}
     ])
 
-# Parámetros nominales de contingencia actualizados según image_780f73.jpg
+# Parámetros nominales estáticos del corte de las 02:55:25 p.m. (Image_5c6018.jpg)
 total_actas = 92766
-procesadas_porc = 98.258  
-observadas_jee = 1607     
+procesadas_porc = 98.273  
+observadas_jee = 1593     
 pendientes = 9            
-corte_temporal = "12/06/2026 09:40:28 a. m."
+corte_temporal = "12/06/2026 02:55:25 p. m."
 
 candidatos = [
-    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9036046, "porcentaje": 50.004},
-    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9034743, "porcentaje": 49.996}
+    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9037650, "porcentaje": 50.004},
+    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9036099, "porcentaje": 49.996}
 ]
 
-# Control de Inyección Dinámica
+# Sincronización dinámica condicionada al estado de la respuesta API
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 98.258))
-        observadas_jee = int(json_data.get("totales_observadas", 1607))
+        procesadas_porc = float(json_data.get("porcentajepros", 98.273))
+        observadas_jee = int(json_data.get("totales_observadas", 1593))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
@@ -119,15 +121,13 @@ else:
     st.sidebar.warning("⚠️ Modo Contingencia Activo")
     st.sidebar.code(status_msg, language="text")
 
-# 2. Lógica del Modelo Analítico
+# ==============================================================================
+# 3. LÓGICA ARITMÉTICA Y CAPA DE PRESENTACIÓN VISUAL
+# ==============================================================================
 candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True)
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
 diferencia_actual = primero["votos"] - segundo["votos"]
-
-# ==============================================================================
-# CAPA DE PRESENTACIÓN VISUAL
-# ==============================================================================
 
 st.sidebar.info(f"Último corte cargado: {corte_temporal}")
 
@@ -147,7 +147,7 @@ with col_2do:
 
 st.markdown("---")
 
-## SECCIÓN II: INDICADORES ESTRUCTURALES Y MARGEN DE CONTROL
+## SECCIÓN II: INDICADORES ESTRUCTURALES Y REGLAS DE ESCAPE MATEMÁTICO
 st.markdown("### ⚖️ MARGEN DE CONTROL")
 col_dif, col_actas = st.columns([2, 1])
 
@@ -163,7 +163,7 @@ with col_actas:
 
 st.markdown("---")
 
-## SECCIÓN III: ANÁLISIS GRÁFICO AVANZADO
+## SECCIÓN III: ANÁLISIS GRÁFICO VECTORIAL
 st.markdown("### 📊 VISUALIZACIÓN ANALÍTICA DEL ESCRUTINIO")
 col_graph1, col_graph2 = st.columns(2)
 
@@ -210,7 +210,7 @@ with col_graph2:
 
 st.markdown("---")
 
-# Elemento estético de cierre: Corazón contenedor con la inscripción "Changuito"
+# Elemento de cierre estético: Contenedor HTML centrado con la firma "Changuito"
 st.markdown(
     """
     <div style="position: relative; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 30px; margin-bottom: 10px;">
@@ -223,6 +223,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# 4. Ciclo Automatizado de Refresco (Frecuencia: 60s)
+# 4. Refresco automatizado del estado del tablero (Ciclo: 60s)
 time.sleep(60)
 st.rerun()
