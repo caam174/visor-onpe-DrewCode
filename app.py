@@ -42,7 +42,7 @@ json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 # ==============================================================================
 # PIPELINE HISTÓRICO REAL (PERSISTENCIA DE SESIÓN)
 # ==============================================================================
-# Actualización secuencial de la matriz temporal con el corte de las 15:00 de image_d961c4.jpg
+# Inclusión del nuevo punto crítico de las 19:05 extraído de image_bf838b.jpg
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Hora": "09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
@@ -53,26 +53,27 @@ if "registro_historico" not in st.session_state:
         {"Hora": "13:12", "Keiko": 9033756, "Roberto": 9032886, "Diferencia Absoluta": 870},
         {"Hora": "13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
         {"Hora": "14:40", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
-        {"Hora": "15:00", "Keiko": 9034071, "Roberto": 9033212, "Diferencia Absoluta": 859}
+        {"Hora": "15:00", "Keiko": 9034071, "Roberto": 9033212, "Diferencia Absoluta": 859},
+        {"Hora": "19:05", "Keiko": 9035493, "Roberto": 9034466, "Diferencia Absoluta": 1027}
     ])
 
-# Datos de contingencia actuales basados estrictamente en image_d961c4.jpg
+# Datos estáticos actuales basados estrictamente en el último corte visualizado
 total_actas = 92766
-procesadas_porc = 98.239  
-observadas_jee = 1623     
-pendientes = 11           
-corte_temporal = "11/06/2026 03:00:25 p. m."
+procesadas_porc = 98.254  
+observadas_jee = 1611     
+pendientes = 9            
+corte_temporal = "11/06/2026 07:05:25 p. m."
 
 candidatos = [
-    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9034071, "porcentaje": 50.002},
-    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9033212, "porcentaje": 49.998}
+    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9035493, "porcentaje": 50.003},
+    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9034466, "porcentaje": 49.997}
 ]
 
 # Control de Inyección Dinámica
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 98.239))
-        observadas_jee = int(json_data.get("totales_observadas", 1623))
+        procesadas_porc = float(json_data.get("porcentajepros", 98.254))
+        observadas_jee = int(json_data.get("totales_observadas", 1611))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
