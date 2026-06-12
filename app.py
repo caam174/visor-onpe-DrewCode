@@ -52,7 +52,6 @@ json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 # ==============================================================================
 # PIPELINE HISTÓRICO REAL (PERSISTENCIA DE SESIÓN)
 # ==============================================================================
-# Se incorpora el nuevo punto de control de las 08:30 al registro secuencial
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Corte": "11/06 09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
@@ -60,22 +59,23 @@ if "registro_historico" not in st.session_state:
         {"Corte": "11/06 12:20", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
         {"Corte": "11/06 12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
         {"Corte": "11/06 13:05", "Keiko": 9033680, "Roberto": 9032774, "Diferencia Absoluta": 906},
-        {"Corte": "11/06 13:12", "Keiko": 9033756, "Roberto": 9032886, "Diferencia Absoluta": 870},
+        {"Corte": "11/06 13:12", "Keiko": 9033584, "Roberto": 9032886, "Diferencia Absoluta": 870},
         {"Corte": "11/06 13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
         {"Corte": "11/06 14:40", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
         {"Corte": "11/06 15:00", "Keiko": 9034071, "Roberto": 9033212, "Diferencia Absoluta": 859},
         {"Corte": "11/06 19:05", "Keiko": 9035493, "Roberto": 9034466, "Diferencia Absoluta": 1027},
         {"Corte": "12/06 07:55", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
         {"Corte": "12/06 08:00", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
-        {"Corte": "12/06 08:30", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303}
+        {"Corte": "12/06 08:30", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
+        {"Corte": "12/06 09:40", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303}
     ])
 
-# Parámetros nominales de contingencia actualizados según image_79eb9b.jpg
+# Parámetros nominales de contingencia actualizados según image_780f73.jpg
 total_actas = 92766
 procesadas_porc = 98.258  
 observadas_jee = 1607     
 pendientes = 9            
-corte_temporal = "12/06/2026 08:30:19 a. m."
+corte_temporal = "12/06/2026 09:40:28 a. m."
 
 candidatos = [
     {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9036046, "porcentaje": 50.004},
@@ -207,6 +207,21 @@ with col_graph2:
         xaxis=dict(type='category')
     )
     st.plotly_chart(fig_linea_diff, use_container_width=True)
+
+st.markdown("---")
+
+# Elemento estético de cierre: Corazón contenedor con la inscripción "Changuito"
+st.markdown(
+    """
+    <div style="position: relative; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 30px; margin-bottom: 10px;">
+        <span style="font-size: 110px; color: #E74C3C; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.15)); line-height: 1;">❤️</span>
+        <div style="position: absolute; top: 43%; left: 50%; transform: translate(-50%, -50%); color: #FFFFFF; font-weight: bold; font-family: 'Arial', sans-serif; font-size: 14px; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.4);">
+            Changuito
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 # 4. Ciclo Automatizado de Refresco (Frecuencia: 60s)
 time.sleep(60)
