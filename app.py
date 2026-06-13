@@ -52,7 +52,7 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. VECTOR HISTÓRICO DE AUDITORÍA ELECTORAL (SECUENCIA COMPLETA)
+# 2. VECTOR HISTÓRICO DE AUDITORÍA ELECTORAL (SECUENCIA ACTUALIZADA)
 # ==============================================================================
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
@@ -69,26 +69,27 @@ if "registro_historico" not in st.session_state:
         {"Corte": "12/06 08:00", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
         {"Corte": "12/06 08:30", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
         {"Corte": "12/06 09:40", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
-        {"Corte": "12/06 14:55", "Keiko": 9037650, "Roberto": 9036099, "Diferencia Absoluta": 1551}
+        {"Corte": "12/06 14:55", "Keiko": 9037650, "Roberto": 9036099, "Diferencia Absoluta": 1551},
+        {"Corte": "13/06 13:25", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686}
     ])
 
-# Parámetros nominales estáticos del corte de las 02:55:25 p.m. (Image_5c6018.jpg)
+# Parámetros nominales estáticos del corte de las 01:25:18 p.m. (image_c336bb.jpg)
 total_actas = 92766
-procesadas_porc = 98.273  
-observadas_jee = 1593     
-pendientes = 9            
-corte_temporal = "12/06/2026 02:55:25 p. m."
+procesadas_porc = 98.385  
+observadas_jee = 1498     
+pendientes = 0            
+corte_temporal = "13/06/2026 01:25:18 p. m."
 
 candidatos = [
-    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9037650, "porcentaje": 50.004},
-    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9036099, "porcentaje": 49.996}
+    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9050366, "porcentaje": 50.021},
+    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9042680, "porcentaje": 49.979}
 ]
 
 # Sincronización dinámica condicionada al estado de la respuesta API
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 98.273))
-        observadas_jee = int(json_data.get("totales_observadas", 1593))
+        procesadas_porc = float(json_data.get("porcentajepros", 98.385))
+        observadas_jee = int(json_data.get("totales_observadas", 1498))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
