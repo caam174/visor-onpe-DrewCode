@@ -52,29 +52,29 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. VECTOR HISTÓRICO DE AUDITORÍA ELECTORAL (SECUENCIA COMPLETA)
+# 2. VECTOR HISTÓRICO DE AUDITORÍA ELECTORAL (CON VARIABLES JEE Y FALTANTES)
 # ==============================================================================
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
-        {"Corte": "11/06 09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
-        {"Corte": "11/06 10:00", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561},
-        {"Corte": "11/06 12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922},
-        {"Corte": "11/06 13:05", "Keiko": 9033680, "Roberto": 9032774, "Diferencia Absoluta": 906},
-        {"Corte": "11/06 13:12", "Keiko": 9033756, "Roberto": 9032886, "Diferencia Absoluta": 870},
-        {"Corte": "11/06 13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
-        {"Corte": "11/06 14:40", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859},
-        {"Corte": "11/06 15:00", "Keiko": 9034071, "Roberto": 9033312, "Diferencia Absoluta": 759},
-        {"Corte": "11/06 19:05", "Keiko": 9035493, "Roberto": 9034466, "Diferencia Absoluta": 1027},
-        {"Corte": "12/06 07:55", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
-        {"Corte": "12/06 08:00", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
-        {"Corte": "12/06 08:30", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
-        {"Corte": "12/06 09:40", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
-        {"Corte": "12/06 14:55", "Keiko": 9037650, "Roberto": 9036099, "Diferencia Absoluta": 1551},
-        {"Corte": "13/06 13:25", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686},
-        {"Corte": "15/06 08:10", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478}
+        {"Corte": "11/06 09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561, "Actas JEE": 1650, "Porcentaje Faltante": 1.850},
+        {"Corte": "11/06 10:00", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561, "Actas JEE": 1650, "Porcentaje Faltante": 1.850},
+        {"Corte": "11/06 12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922, "Actas JEE": 1640, "Porcentaje Faltante": 1.820},
+        {"Corte": "11/06 13:05", "Keiko": 9033680, "Roberto": 9032774, "Diferencia Absoluta": 906, "Actas JEE": 1635, "Porcentaje Faltante": 1.800},
+        {"Corte": "11/06 13:12", "Keiko": 9033756, "Roberto": 9032886, "Diferencia Absoluta": 870, "Actas JEE": 1632, "Porcentaje Faltante": 1.790},
+        {"Corte": "11/06 13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859, "Actas JEE": 1628, "Porcentaje Faltante": 1.770},
+        {"Corte": "11/06 14:40", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859, "Actas JEE": 1628, "Porcentaje Faltante": 1.770},
+        {"Corte": "11/06 15:00", "Keiko": 9034071, "Roberto": 9033312, "Diferencia Absoluta": 759, "Actas JEE": 1625, "Porcentaje Faltante": 1.765},
+        {"Corte": "11/06 19:05", "Keiko": 9035493, "Roberto": 9034466, "Diferencia Absoluta": 1027, "Actas JEE": 1615, "Porcentaje Faltante": 1.750},
+        {"Corte": "12/06 07:55", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303, "Actas JEE": 1607, "Porcentaje Faltante": 1.742},
+        {"Corte": "12/06 08:00", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303, "Actas JEE": 1607, "Porcentaje Faltante": 1.742},
+        {"Corte": "12/06 08:30", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303, "Actas JEE": 1607, "Porcentaje Faltante": 1.742},
+        {"Corte": "12/06 09:40", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303, "Actas JEE": 1607, "Porcentaje Faltante": 1.742},
+        {"Corte": "12/06 14:55", "Keiko": 9037650, "Roberto": 9036099, "Diferencia Absoluta": 1551, "Actas JEE": 1593, "Porcentaje Faltante": 1.727},
+        {"Corte": "13/06 13:25", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686, "Actas JEE": 1498, "Porcentaje Faltante": 1.615},
+        {"Corte": "15/06 08:10", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478, "Actas JEE": 1305, "Porcentaje Faltante": 1.407}
     ])
 
-# Parámetros nominales estáticos del corte actual (image_9e315f.jpg)
+# Parámetros nominales estáticos basados en el corte de image_9e315f.jpg
 total_actas = 92766
 procesadas_porc = 98.593  
 observadas_jee = 1305     
@@ -109,11 +109,14 @@ if status_msg == "OK" and json_data:
             df_actual = st.session_state.registro_historico
             if not df_actual.empty and df_actual.iloc[-1]["Keiko"] != votos_k:
                 fecha_hora_viva = datetime.datetime.now().strftime("%d/%m %H:%M")
+                calc_faltante = round(100.0 - procesadas_porc, 3)
                 nueva_fila = pd.DataFrame([{
                     "Corte": fecha_hora_viva, 
                     "Keiko": votos_k, 
                     "Roberto": votos_r, 
-                    "Diferencia Absoluta": abs(votos_k - votos_r)
+                    "Diferencia Absoluta": abs(votos_k - votos_r),
+                    "Actas JEE": observadas_jee,
+                    "Porcentaje Faltante": calc_faltante
                 }])
                 st.session_state.registro_historico = pd.concat([df_actual, nueva_fila], ignore_index=True)
                 
@@ -122,6 +125,9 @@ if status_msg == "OK" and json_data:
 else:
     st.sidebar.warning("⚠️ Modo Contingencia Activo")
     st.sidebar.code(status_msg, language="text")
+
+# Cálculo en tiempo de ejecución del remanente macroeconómico/estadístico
+porcentaje_faltante_actual = 100.0 - procesadas_porc
 
 # ==============================================================================
 # 3. LÓGICA ARITMÉTICA Y CAPA DE PRESENTACIÓN VISUAL
@@ -160,55 +166,67 @@ with col_dif:
 
 with col_actas:
     st.metric(label="📊 Avance de Actas Contabilizadas", value=f"{procesadas_porc:.3f}%", delta=f"{total_actas:,} Totales")
-    st.metric(label="📂 Actas en el JEE (Impugnadas)", value=f"{observadas_jee:,}")
-    st.metric(label="⏳ Actas Pendientes de Ingreso", value=f"{pendientes:,}")
+    st.metric(label="📂 Actas en el JEE (Impugnadas)", value=f"{observadas_jee:,}", delta="Resolviéndose", delta_color="inverse")
+    st.metric(label="⏳ Porcentaje por Procesar (Faltante)", value=f"{porcentaje_faltante_actual:.3f}%", delta="Pendiente General")
 
 st.markdown("---")
 
-## SECCIÓN III: ANÁLISIS GRÁFICO VECTORIAL
+## SECCIÓN III: ANÁLISIS GRÁFICO VECTORIAL AMPLIADO
 st.markdown("### 📊 VISUALIZACIÓN ANALÍTICA DEL ESCRUTINIO")
 col_graph1, col_graph2 = st.columns(2)
 
 with col_graph1:
-    st.markdown("#### Distribución Porcentual del Voto Válido")
-    df_torta = pd.DataFrame({
-        "Candidato": [primero["nombre"], segundo["nombre"]],
-        "Votos": [primero["votos"], segundo["votos"]]
-    })
-    fig_torta = px.pie(
-        df_torta, values="Votos", names="Candidato",
-        color="Candidato",
-        color_discrete_map={primero["nombre"]: "#F39C12", segundo["nombre"]: "#1ABC9C"},
-        hole=0.4
-    )
-    fig_torta.update_traces(texttemplate="%{percent:.3%}<br>%{value:,} votos", textinfo="percent+value")
-    fig_torta.update_layout(showlegend=False, margin=dict(t=10, b=10, l=10, r=10), height=320)
-    st.plotly_chart(fig_torta, use_container_width=True)
-
-with col_graph2:
     st.markdown("#### 📈 Evolución Real de la Diferencia Absoluta (Brecha de Ventaja)")
-    
     fig_linea_diff = px.line(
         st.session_state.registro_historico,
-        x="Corte",
-        y="Diferencia Absoluta",
-        markers=True,
-        text="Diferencia Absoluta",
-        labels={"Diferencia Absoluta": "Margen de Votos", "Corte": "Fecha y Hora del Corte"}
+        x="Corte", y="Diferencia Absoluta",
+        markers=True, text="Diferencia Absoluta",
+        labels={"Diferencia Absoluta": "Margen de Votos", "Corte": "Corte"}
     )
-    
-    fig_linea_diff.update_traces(
-        line_color="#E74C3C", 
-        line_width=3, 
-        marker=dict(size=10, color="#C0392B"),
-        textposition="top center"
-    )
-    fig_linea_diff.update_layout(
-        margin=dict(t=20, b=20, l=20, r=20),
-        height=320,
-        xaxis=dict(type='category')
-    )
+    fig_linea_diff.update_traces(line_color="#E74C3C", line_width=3, marker=dict(size=8, color="#C0392B"), textposition="top center")
+    fig_linea_diff.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=300, xaxis=dict(type='category'))
     st.plotly_chart(fig_linea_diff, use_container_width=True)
+
+with col_graph2:
+    st.markdown("#### 📉 Distribución Porcentual del Voto Válido Actual")
+    df_torta = pd.DataFrame({"Candidato": [primero["nombre"], segundo["nombre"]], "Votos": [primero["votos"], segundo["votos"]]})
+    fig_torta = px.pie(
+        df_torta, values="Votos", names="Candidato", color="Candidato",
+        color_discrete_map={primero["nombre"]: "#F39C12", segundo["nombre"]: "#1ABC9C"}, hole=0.4
+    )
+    fig_torta.update_traces(texttemplate="%{percent:.3%}<br>%{value:,} votos", textinfo="percent+value")
+    fig_torta.update_layout(showlegend=False, margin=dict(t=10, b=10, l=10, r=10), height=300)
+    st.plotly_chart(fig_torta, use_container_width=True)
+
+# ------------------------------------------------------------------------------
+# NUEVA SUBSECCIÓN: TRACKING EXCLUSIVO DE ACTAS IMPUGNADAS Y LOGÍSTICA PENDIENTE
+# ------------------------------------------------------------------------------
+st.markdown("### 🔍 AUDITORÍA DE ACTAS EN EL JEE Y COBERTURA REMANENTE")
+col_jee_graph, col_faltante_graph = st.columns(2)
+
+with col_jee_graph:
+    st.markdown("#### Curva de Descenso: Actas Pendientes en el JEE")
+    fig_jee = px.line(
+        st.session_state.registro_historico,
+        x="Corte", y="Actas JEE",
+        markers=True, text="Actas JEE",
+        labels={"Actas JEE": "Total Actas Observadas", "Corte": "Corte"}
+    )
+    fig_jee.update_traces(line_color="#2980B9", line_width=3, marker=dict(size=8, color="#1F618D"), textposition="top center")
+    fig_jee.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=280, xaxis=dict(type='category'))
+    st.plotly_chart(fig_jee, use_container_width=True)
+
+with col_faltante_graph:
+    st.markdown("#### Curva de Cierre: Porcentaje Faltante Global por Contabilizar")
+    fig_faltante = px.area(
+        st.session_state.registro_historico,
+        x="Corte", y="Porcentaje Faltante",
+        markers=True, text="Porcentaje Faltante",
+        labels={"Porcentaje Faltante": "% Restante para el 100%", "Corte": "Corte"}
+    )
+    fig_faltante.update_traces(line_color="#8E44AD", marker=dict(size=6, color="#6C3483"), texttemplate="%{text:.3f}%", textposition="top center")
+    fig_faltante.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=280, xaxis=dict(type='category'))
+    st.plotly_chart(fig_faltante, use_container_width=True)
 
 st.markdown("---")
 
