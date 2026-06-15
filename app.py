@@ -49,24 +49,24 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL Y AUDITORÍA VECTORIAL CORREGIDA
+# 2. PARAMETRIZACIÓN NOMINAL Y AUDITORÍA VECTORIAL (CORTE VERBATIM)
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 98.593  # Avance del pipeline de digitación primaria
-observadas_jee = 1305     # Stock retenido en el tribunal electoral
-corte_temporal = "15/06/2026 08:10:19 a. m."
+procesadas_porc = 98.593  
+observadas_jee = 1305     
+corte_temporal = "15/06/2026 08:30:27 a. m."
 
 candidatos = [
     {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9075116, "porcentaje": 50.051},
     {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9056638, "porcentaje": 49.949}
 ]
 
-# Recalculo dinámico basado en las identidades macro-electorales
+# Ecuación de balance macro-electoral
 por_procesar_porc = 100.0 - procesadas_porc
 jee_porc = (observadas_jee / total_actas) * 100
-faltante_total_inicial = por_procesar_porc + jee_porc  # 2.814% para el último corte
+faltante_total_inicial = por_procesar_porc + jee_porc  # 2.814%
 
-# Registro histórico ajustado cronológicamente con la métrica corregida (mayor y exacta)
+# Historial con el nuevo punto secuencial indexado de la imagen image_9430dc.jpg
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Corte": "11/06 09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561, "Actas JEE": 1650, "Porcentaje Faltante": 3.629},
@@ -74,7 +74,8 @@ if "registro_historico" not in st.session_state:
         {"Corte": "11/06 13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859, "Actas JEE": 1628, "Porcentaje Faltante": 3.525},
         {"Corte": "12/06 07:55", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303, "Actas JEE": 1607, "Porcentaje Faltante": 3.473},
         {"Corte": "13/06 13:25", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686, "Actas JEE": 1498, "Porcentaje Faltante": 3.230},
-        {"Corte": "15/06 08:10", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478, "Actas JEE": 1305, "Porcentaje Faltante": round(faltante_total_inicial, 3)}
+        {"Corte": "15/06 08:10", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478, "Actas JEE": 1305, "Porcentaje Faltante": 2.814},
+        {"Corte": "15/06 08:30", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478, "Actas JEE": 1305, "Porcentaje Faltante": round(faltante_total_inicial, 3)}
     ])
 
 if status_msg == "OK" and json_data:
@@ -92,7 +93,6 @@ if status_msg == "OK" and json_data:
             ]
             corte_temporal = "Sincronizado en Tiempo Real"
             
-            # Recálculo de la ecuación de balance en tiempo real
             por_procesar_porc = 100.0 - procesadas_porc
             jee_porc = (observadas_jee / total_actas) * 100
             faltante_total_actual = por_procesar_porc + jee_porc
@@ -112,7 +112,6 @@ if status_msg == "OK" and json_data:
     except Exception as e:
         st.sidebar.error(f"Error de parsing: {str(e)}")
 
-# Consolidación final de variables de salida
 porcentaje_faltante_real = por_procesar_porc + jee_porc
 
 # ==============================================================================
@@ -140,7 +139,7 @@ with col_2do:
 
 st.markdown("---")
 
-## SECCIÓN II: METRICAS ESTRUCTURALES CORREGIDAS
+## SECCIÓN II: MÉTRICAS ESTRUCTURALES CORREGIDAS
 st.markdown("### ⚖️ MARGEN DE CONTROL")
 col_dif, col_actas = st.columns([2, 1])
 
@@ -156,7 +155,7 @@ with col_actas:
 
 st.markdown("---")
 
-## SECCIÓN III: ANÁLISIS GRÁFICO VECTORIAL AMPLIADO
+## SECCIÓN III: ANÁLISIS GRÁFICO VECTORIAL
 st.markdown("### 📊 VISUALIZACIÓN ANALÍTICA DEL ESCRUTINIO")
 col_graph1, col_graph2 = st.columns(2)
 
@@ -181,7 +180,7 @@ with col_graph2:
     fig_torta.update_layout(showlegend=False, margin=dict(t=10, b=10, l=10, r=10), height=280)
     st.plotly_chart(fig_torta, use_container_width=True)
 
-# Cobertura remanente con curvas de descenso recalibradas bajo el nuevo criterio
+# Cobertura remanente con curvas de descenso recalibradas
 st.markdown("### 🔍 AUDITORÍA DE ACTAS EN EL JEE Y COBERTURA REMANENTE RECALIBRADA")
 col_jee_graph, col_faltante_graph = st.columns(2)
 
