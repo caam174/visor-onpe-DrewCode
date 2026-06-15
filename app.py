@@ -6,7 +6,7 @@ import datetime
 import time
 
 # ==============================================================================
-# 1. INFRAESTRUCTURA VISUAL E INYECCIÓN DE ESTILO CRÍTICO (CMU SERIF & CLEAN LAYOUT)
+# 1. INFRAESTRUCTURA VISUAL E INYECCIÓN DE ESTILE CRÍTICO (CMU SERIF & CLEAN LAYOUT)
 # ==============================================================================
 st.set_page_config(page_title="Control de Escrutinio ONPE", layout="wide")
 
@@ -37,6 +37,7 @@ st.markdown(
             padding: 25px;
             margin-bottom: 15px;
             box-shadow: 0px 2px 4px rgba(0,0,0,0.02);
+            text-align: center; /* Alineación simétrica central para todo el recuadro */
         }
         
         .card-metrica {
@@ -101,21 +102,21 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL ACTUALIZADA (image_85b7c5.jpg)
+# 2. PARAMETRIZACIÓN NOMINAL CONSOLIDADA (image_85b7c5.jpg)
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 98.600  # Actualizado desde la imagen
-observadas_jee = 1299     # Actualizado desde la imagen
-corte_temporal = "15/06/2026 11:25:19 a. m."  # Actualizado desde la imagen
+procesadas_porc = 98.600  
+observadas_jee = 1299     
+corte_temporal = "15/06/2026 11:25:19 a. m."  
 
 candidatos = [
-    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "votos": 9075495, "porcentaje": 50.050}, # Datos image_85b7c5.jpg
-    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "votos": 9057202, "porcentaje": 49.950} # Datos image_85b7c5.jpg
+    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "votos": 9075495, "porcentaje": 50.050}, 
+    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "votos": 9057202, "porcentaje": 49.950} 
 ]
 
 por_procesar_porc = 100.0 - procesadas_porc
 jee_porc = (observadas_jee / total_actas) * 100
-faltante_total_inicial = por_procesar_porc + jee_porc  # 1.400% + 1.400% = 2.800%
+faltante_total_inicial = por_procesar_porc + jee_porc  
 
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
@@ -163,7 +164,7 @@ if status_msg == "OK" and json_data:
     except Exception as e:
         st.sidebar.error(f"Error de parsing: {str(e)}")
 
-# Asignación de ordenación jerárquica y colores de alto impacto visual
+# Configuración analítica de orden de mérito y paleta llamativa
 candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True)
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
@@ -178,7 +179,7 @@ st.sidebar.info(f"Corte: {corte_temporal}")
 # 3. CAPA DE PRESENTACIÓN DE ALTA VISIBILIDAD DE DATOS
 # ==============================================================================
 
-## SECCIÓN I: MARGEN DE POSICIONES (RECALIBRADO DE COLORES)
+## SECCIÓN I: MARGEN DE POSICIONES (RECALIBRADO TIPOGRÁFICO Y ALINEACIÓN CENTRAL)
 st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>🥇 ESTADO NOMINAL DE LA CONTIENDA (VOTOS VÁLIDOS)</h3>", unsafe_allow_html=True)
 col_1er, col_2do = st.columns(2)
 
@@ -186,12 +187,15 @@ with col_1er:
     st.markdown(
         f"""
         <div class="card-candidato" style="border-top: 6px solid {primero['color']}; background-color: #F4F8FF;">
-            <span style="font-size: 14px; font-weight: bold; color: {primero['color']}; letter-spacing: 1px;">✓ PRIMER LUGAR (GANADOR ACTUAL)</span>
+            <!-- Tipografía centrada, agrandada a 18px y destacada en azul -->
+            <div style="font-size: 18px; font-weight: bold; color: {primero['color']}; letter-spacing: 1.5px; margin-bottom: 12px; text-align: center;">
+                ✓ PRIMER LUGAR (GANADOR ACTUAL)
+            </div>
             <h2 style="font-size: 26px; margin-top: 5px; margin-bottom: 10px; color: #000033;">{primero['nombre']}</h2>
             <div style="font-size: 48px; font-weight: bold; color: {primero['color']}; line-height: 1;">
                 {primero['votos']:,} <span style="font-size: 24px; font-weight: normal; color: #555555;">votos</span>
             </div>
-            <div style="font-size: 22px; color: #111111; margin-top: 6px; font-weight: bold;">Porcentaje Válido: {primero['porcentaje']:.3f}%</div>
+            <div style="font-size: 22px; color: #111111; margin-top: 8px; font-weight: bold;">Porcentaje Válido: {primero['porcentaje']:.3f}%</div>
         </div>
         """,
         unsafe_allow_html=True
@@ -201,12 +205,15 @@ with col_2do:
     st.markdown(
         f"""
         <div class="card-candidato" style="border-top: 6px solid {segundo['color']}; background-color: #FFF4F4;">
-            <span style="font-size: 14px; font-weight: bold; color: {segundo['color']}; letter-spacing: 1px;">SEGUNDO LUGAR</span>
+            <!-- Tipografía centrada, agrandada a 18px y destacada en rojo -->
+            <div style="font-size: 18px; font-weight: bold; color: {segundo['color']}; letter-spacing: 1.5px; margin-bottom: 12px; text-align: center;">
+                SEGUNDO LUGAR
+            </div>
             <h2 style="font-size: 26px; margin-top: 5px; margin-bottom: 10px; color: #330000;">{segundo['nombre']}</h2>
             <div style="font-size: 48px; font-weight: bold; color: {segundo['color']}; line-height: 1;">
                 {segundo['votos']:,} <span style="font-size: 24px; font-weight: normal; color: #555555;">votos</span>
             </div>
-            <div style="font-size: 22px; color: #111111; margin-top: 6px; font-weight: bold;">Porcentaje Válido: {segundo['porcentaje']:.3f}%</div>
+            <div style="font-size: 22px; color: #111111; margin-top: 8px; font-weight: bold;">Porcentaje Válido: {segundo['porcentaje']:.3f}%</div>
         </div>
         """,
         unsafe_allow_html=True
@@ -260,7 +267,7 @@ with col_m2:
 
 st.markdown("<br><hr>", unsafe_allow_html=True)
 
-## SECCIÓN III: ANÁLISIS GRÁFICO (RECALIBRACIÓN CROMÁTICA DE VECTORES)
+## SECCIÓN III: ANÁLISIS GRÁFICO (VECTORES CROMÁTICOS)
 st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>📊 ANALÍTICA GRÁFICA DE TENDENCIAS</h3>", unsafe_allow_html=True)
 col_graph1, col_graph2 = st.columns(2)
 
@@ -272,7 +279,7 @@ with col_graph1:
         st.session_state.registro_historico, x="Corte", y="Diferencia Absoluta",
         markers=True, text="Diferencia Absoluta"
     )
-    fig_linea_diff.update_traces(line_color="#198754", line_width=3, textposition="top center")  # Vector en Verde
+    fig_linea_diff.update_traces(line_color="#198754", line_width=3, textposition="top center")  
     fig_linea_diff.update_layout(
         font=plotly_font_config,
         margin=dict(t=15, b=15, l=15, r=15), 
@@ -288,7 +295,7 @@ with col_graph2:
     df_torta = pd.DataFrame({"Candidato": [primero["nombre"], segundo["nombre"]], "Votos": [primero["votos"], segundo["votos"]]})
     fig_torta = px.pie(
         df_torta, values="Votos", names="Candidato", hole=0.45,
-        color_discrete_sequence=[primero["color"], segundo["color"]]  # Azul para el 1ro, Rojo para el 2do
+        color_discrete_sequence=[primero["color"], segundo["color"]]  
     )
     fig_torta.update_traces(texttemplate="<b>%{percent:.3%}</b><br>%{value:,} votos", textfont_size=13)
     fig_torta.update_layout(
