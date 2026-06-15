@@ -49,7 +49,7 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL Y AUDITORÍA VECTORIAL (CORTE VERBATIM)
+# 2. PARAMETRIZACIÓN NOMINAL Y AUDITORÍA VECTORIAL
 # ==============================================================================
 total_actas = 92766
 procesadas_porc = 98.593  
@@ -61,12 +61,11 @@ candidatos = [
     {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9056638, "porcentaje": 49.949}
 ]
 
-# Ecuación de balance macro-electoral
+# Ecuación de balance macro-electoral (mantenida internamente para curvas de series de tiempo)
 por_procesar_porc = 100.0 - procesadas_porc
 jee_porc = (observadas_jee / total_actas) * 100
-faltante_total_inicial = por_procesar_porc + jee_porc  # 2.814%
+faltante_total_inicial = por_procesar_porc + jee_porc  
 
-# Historial con el nuevo punto secuencial indexado de la imagen image_9430dc.jpg
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Corte": "11/06 09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561, "Actas JEE": 1650, "Porcentaje Faltante": 3.629},
@@ -112,8 +111,6 @@ if status_msg == "OK" and json_data:
     except Exception as e:
         st.sidebar.error(f"Error de parsing: {str(e)}")
 
-porcentaje_faltante_real = por_procesar_porc + jee_porc
-
 # ==============================================================================
 # 3. CAPA DE PRESENTACIÓN VISUAL
 # ==============================================================================
@@ -139,7 +136,7 @@ with col_2do:
 
 st.markdown("---")
 
-## SECCIÓN II: MÉTRICAS ESTRUCTURALES CORREGIDAS
+## SECCIÓN II: MÉTRICAS ESTRUCTURALES MODIFICADAS
 st.markdown("### ⚖️ MARGEN DE CONTROL")
 col_dif, col_actas = st.columns([2, 1])
 
@@ -151,7 +148,6 @@ with col_dif:
 with col_actas:
     st.metric(label="📊 Avance de Actas Procesadas", value=f"{procesadas_porc:.3f}%", delta=f"{total_actas:,} Totales")
     st.metric(label="📂 Actas en el JEE (Impugnadas/Stock)", value=f"{observadas_jee:,}", delta=f"{jee_porc:.3f}% del total")
-    st.metric(label="⏳ Porcentaje Faltante Real (Cierre Total)", value=f"{porcentaje_faltante_real:.3f}%", delta="Pendiente Integrar", delta_color="inverse")
 
 st.markdown("---")
 
@@ -180,7 +176,7 @@ with col_graph2:
     fig_torta.update_layout(showlegend=False, margin=dict(t=10, b=10, l=10, r=10), height=280)
     st.plotly_chart(fig_torta, use_container_width=True)
 
-# Cobertura remanente con curvas de descenso recalibradas
+# Cobertura remanente con curvas de descenso
 st.markdown("### 🔍 AUDITORÍA DE ACTAS EN EL JEE Y COBERTURA REMANENTE RECALIBRADA")
 col_jee_graph, col_faltante_graph = st.columns(2)
 
