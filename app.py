@@ -10,7 +10,7 @@ import time
 # ==============================================================================
 st.set_page_config(page_title="Control de Escrutinio ONPE", layout="wide")
 
-# Inyección CSS Global para control de fuentes grandes, tipografía CMU y limpieza visual
+# Inyección CSS Global para fuentes CMU, tamaños grandes y control de tarjetas limpia
 st.markdown(
     """
     <style>
@@ -60,12 +60,12 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Encabezado limpio e institucional
+# Encabezado corregido: Centrado y libre de prefijos "PE"
 st.markdown(
     """
-    <div style="margin-bottom: 25px;">
-        <h1 style="font-size: 42px; margin-bottom: 5px;">
-            <span style="vertical-align: middle;">🇵🇪</span> Sistema de Fiscalización y Conteo de Actas
+    <div style="margin-bottom: 25px; text-align: center;">
+        <h1 style="font-size: 44px; margin-bottom: 5px; color: #000033;">
+            Sistema de Fiscalización y Conteo de Actas
         </h1>
         <p style="font-size: 16px; color: #555555; font-style: italic; margin-top: 0px;">
             Filtro de precisión analítica con actualización recursiva cada 60 segundos
@@ -101,21 +101,21 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL Y AUDITORÍA VECTORIAL
+# 2. PARAMETRIZACIÓN NOMINAL ACTUALIZADA (image_85b7c5.jpg)
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 98.598  
-observadas_jee = 1301     
-corte_temporal = "15/06/2026 10:55:19 a. m."
+procesadas_porc = 98.600  # Actualizado desde la imagen
+observadas_jee = 1299     # Actualizado desde la imagen
+corte_temporal = "15/06/2026 11:25:19 a. m."  # Actualizado desde la imagen
 
 candidatos = [
-    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "votos": 9075361, "porcentaje": 50.051, "color": "#F39C12"},
-    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "votos": 9057036, "porcentaje": 49.949, "color": "#1ABC9C"}
+    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "votos": 9075495, "porcentaje": 50.050}, # Datos image_85b7c5.jpg
+    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "votos": 9057202, "porcentaje": 49.950} # Datos image_85b7c5.jpg
 ]
 
 por_procesar_porc = 100.0 - procesadas_porc
 jee_porc = (observadas_jee / total_actas) * 100
-faltante_total_inicial = por_procesar_porc + jee_porc  
+faltante_total_inicial = por_procesar_porc + jee_porc  # 1.400% + 1.400% = 2.800%
 
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
@@ -125,22 +125,22 @@ if "registro_historico" not in st.session_state:
         {"Corte": "12/06 07:55", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303, "Actas JEE": 1607, "Porcentaje Faltante": 3.473},
         {"Corte": "13/06 13:25", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686, "Actas JEE": 1498, "Porcentaje Faltante": 3.230},
         {"Corte": "15/06 08:10", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478, "Actas JEE": 1305, "Porcentaje Faltante": 2.814},
-        {"Corte": "15/06 08:30", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478, "Actas JEE": 1305, "Porcentaje Faltante": 2.814},
-        {"Corte": "15/06 10:55", "Keiko": 9075361, "Roberto": 9057036, "Diferencia Absoluta": 18325, "Actas JEE": 1301, "Porcentaje Faltante": round(faltante_total_inicial, 3)}
+        {"Corte": "15/06 10:55", "Keiko": 9075361, "Roberto": 9057036, "Diferencia Absoluta": 18325, "Actas JEE": 1301, "Porcentaje Faltante": 2.802},
+        {"Corte": "15/06 11:25", "Keiko": 9075495, "Roberto": 9057202, "Diferencia Absoluta": 18293, "Actas JEE": 1299, "Porcentaje Faltante": round(faltante_total_inicial, 3)}
     ])
 
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 98.598))
-        observadas_jee = int(json_data.get("totales_observadas", 1301))
+        procesadas_porc = float(json_data.get("porcentajepros", 98.600))
+        observadas_jee = int(json_data.get("totales_observadas", 1299))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
             votos_k = int(str(lista_api[0].get("votos")).replace(",", ""))
             votos_r = int(str(lista_api[1].get("votos")).replace(",", ""))
             candidatos = [
-                {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "votos": votos_k, "porcentaje": float(lista_api[0].get("porcentaje")), "color": "#F39C12"},
-                {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "votos": votos_r, "porcentaje": float(lista_api[1].get("porcentaje")), "color": "#1ABC9C"}
+                {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "votos": votos_k, "porcentaje": float(lista_api[0].get("porcentaje"))},
+                {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "votos": votos_r, "porcentaje": float(lista_api[1].get("porcentaje"))}
             ]
             corte_temporal = "Sincronizado en Tiempo Real"
             
@@ -163,32 +163,35 @@ if status_msg == "OK" and json_data:
     except Exception as e:
         st.sidebar.error(f"Error de parsing: {str(e)}")
 
-# Ordenación formal por volumen de votación
+# Asignación de ordenación jerárquica y colores de alto impacto visual
 candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True)
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
-diferencia_actual = primero["votos"] - segundo["votos"]
 
+primero["color"] = "#0046AD"  # Azul Eléctrico Llamativo para el Ganador
+segundo["color"] = "#D9381E"  # Rojo Alerta Llamativo para el Segundo Puesto
+
+diferencia_actual = primero["votos"] - segundo["votos"]
 st.sidebar.info(f"Corte: {corte_temporal}")
 
 # ==============================================================================
-# 3. CAPA DE PRESENTACIÓN DE ALTA VISIBILIDAD (LETRAS GRANDES Y LIMPIAS)
+# 3. CAPA DE PRESENTACIÓN DE ALTA VISIBILIDAD DE DATOS
 # ==============================================================================
 
-## SECCIÓN I: MARGEN DE POSICIONES (HTML PURIFICADO)
+## SECCIÓN I: MARGEN DE POSICIONES (RECALIBRADO DE COLORES)
 st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>🥇 ESTADO NOMINAL DE LA CONTIENDA (VOTOS VÁLIDOS)</h3>", unsafe_allow_html=True)
 col_1er, col_2do = st.columns(2)
 
 with col_1er:
     st.markdown(
         f"""
-        <div class="card-candidato" style="border-top: 5px solid {primero['color']};">
-            <span style="font-size: 14px; font-weight: bold; color: {primero['color']}; letter-spacing: 1px;">✓ LÍDER EN ESCRUTINIO</span>
-            <h2 style="font-size: 26px; margin-top: 5px; margin-bottom: 10px; color: #111111;">{primero['nombre']}</h2>
-            <div style="font-size: 46px; font-weight: bold; color: #000022; line-height: 1;">
+        <div class="card-candidato" style="border-top: 6px solid {primero['color']}; background-color: #F4F8FF;">
+            <span style="font-size: 14px; font-weight: bold; color: {primero['color']}; letter-spacing: 1px;">✓ PRIMER LUGAR (GANADOR ACTUAL)</span>
+            <h2 style="font-size: 26px; margin-top: 5px; margin-bottom: 10px; color: #000033;">{primero['nombre']}</h2>
+            <div style="font-size: 48px; font-weight: bold; color: {primero['color']}; line-height: 1;">
                 {primero['votos']:,} <span style="font-size: 24px; font-weight: normal; color: #555555;">votos</span>
             </div>
-            <div style="font-size: 22px; color: #333333; margin-top: 5px; font-weight: bold;">Porcentaje Válido: {primero['porcentaje']:.3f}%</div>
+            <div style="font-size: 22px; color: #111111; margin-top: 6px; font-weight: bold;">Porcentaje Válido: {primero['porcentaje']:.3f}%</div>
         </div>
         """,
         unsafe_allow_html=True
@@ -197,13 +200,13 @@ with col_1er:
 with col_2do:
     st.markdown(
         f"""
-        <div class="card-candidato" style="border-top: 5px solid {segundo['color']};">
-            <span style="font-size: 14px; font-weight: bold; color: #777777; letter-spacing: 1px;">SEGUNDA POSICIÓN</span>
-            <h2 style="font-size: 26px; margin-top: 5px; margin-bottom: 10px; color: #111111;">{segundo['nombre']}</h2>
-            <div style="font-size: 46px; font-weight: bold; color: #000022; line-height: 1;">
+        <div class="card-candidato" style="border-top: 6px solid {segundo['color']}; background-color: #FFF4F4;">
+            <span style="font-size: 14px; font-weight: bold; color: {segundo['color']}; letter-spacing: 1px;">SEGUNDO LUGAR</span>
+            <h2 style="font-size: 26px; margin-top: 5px; margin-bottom: 10px; color: #330000;">{segundo['nombre']}</h2>
+            <div style="font-size: 48px; font-weight: bold; color: {segundo['color']}; line-height: 1;">
                 {segundo['votos']:,} <span style="font-size: 24px; font-weight: normal; color: #555555;">votos</span>
             </div>
-            <div style="font-size: 22px; color: #333333; margin-top: 5px; font-weight: bold;">Porcentaje Válido: {segundo['porcentaje']:.3f}%</div>
+            <div style="font-size: 22px; color: #111111; margin-top: 6px; font-weight: bold;">Porcentaje Válido: {segundo['porcentaje']:.3f}%</div>
         </div>
         """,
         unsafe_allow_html=True
@@ -211,20 +214,20 @@ with col_2do:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-## SECCIÓN II: MARGEN DE CONTROL MATEMÁTICO (LETRAS MAXIMIZADAS)
+## SECCIÓN II: MARGEN DE CONTROL MATEMÁTICO (DIFERENCIA EN VERDE DE PRECISIÓN)
 st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>⚖️ PARAMETRÍA ESTRUCTURAL Y BRECHAS</h3>", unsafe_allow_html=True)
 col_dif, col_m1, col_m2 = st.columns([2, 1, 1])
 
 with col_dif:
     st.markdown(
         f"""
-        <div class="card-metrica" style="background-color: #FFF9F9; border-left-color: #D9534F; padding: 25px;">
-            <span style="font-size: 13px; font-weight: bold; color: #D9534F; letter-spacing: 0.5px;">VENTAJA ABSOLUTA DEL PRIMER LUGAR</span>
-            <div style="font-size: 52px; font-weight: bold; color: #B92C28; line-height: 1.1; margin-top: 5px;">
-                {diferencia_actual:,} <span style="font-size: 22px; font-weight: normal; color: #555555;">Votos de Diferencia</span>
+        <div class="card-metrica" style="background-color: #F4FBF6; border-left-color: #198754; padding: 25px;">
+            <span style="font-size: 13px; font-weight: bold; color: #198754; letter-spacing: 0.5px;">VENTAJA ABSOLUTA DEL PRIMER LUGAR</span>
+            <div style="font-size: 54px; font-weight: bold; color: #198754; line-height: 1.1; margin-top: 5px;">
+                {diferencia_actual:,} <span style="font-size: 24px; font-weight: normal; color: #444444;">Votos de Diferencia</span>
             </div>
-            <p style="font-size: 14px; color: #666666; margin-top: 8px; margin-bottom: 0px; font-style: italic;">
-                Umbral crítico de contingencia remanente en actas del JEE.
+            <p style="font-size: 14px; color: #555555; margin-top: 8px; margin-bottom: 0px; font-style: italic;">
+                Margen neto de resguardo frente al volumen pendiente de resolución en los JEE.
             </p>
         </div>
         """,
@@ -234,10 +237,10 @@ with col_dif:
 with col_m1:
     st.markdown(
         f"""
-        <div class="card-metrica" style="padding: 22px;">
-            <span style="font-size: 13px; color: #555555; font-weight: bold;">ACTAS PROCESADAS</span>
-            <div style="font-size: 36px; font-weight: bold; color: #000080; margin-top: 5px;">{procesadas_porc:.3f}%</div>
-            <span style="font-size: 14px; color: #444444;">{total_actas:,} Actas Totales</span>
+        <div class="card-metrica" style="border-left-color: #666666; padding: 22px;">
+            <span style="font-size: 13px; color: #555555; font-weight: bold;">ACTAS CONTABILIZADAS</span>
+            <div style="font-size: 36px; font-weight: bold; color: #111111; margin-top: 5px;">{procesadas_porc:.3f}%</div>
+            <span style="font-size: 14px; color: #555555;">{total_actas:,} Actas Totales</span>
         </div>
         """,
         unsafe_allow_html=True
@@ -247,9 +250,9 @@ with col_m2:
     st.markdown(
         f"""
         <div class="card-metrica" style="border-left-color: #2980B9; padding: 22px;">
-            <span style="font-size: 13px; color: #555555; font-weight: bold;">STOCK EN EL JEE</span>
+            <span style="font-size: 13px; color: #555555; font-weight: bold;">PARA ENVÍO AL JEE</span>
             <div style="font-size: 36px; font-weight: bold; color: #2980B9; margin-top: 5px;">{observadas_jee:,}</div>
-            <span style="font-size: 14px; color: #444444;">Equivale al {jee_porc:.3f}%</span>
+            <span style="font-size: 14px; color: #555555;">Equivale al {jee_porc:.3f}%</span>
         </div>
         """,
         unsafe_allow_html=True
@@ -257,20 +260,19 @@ with col_m2:
 
 st.markdown("<br><hr>", unsafe_allow_html=True)
 
-## SECCIÓN III: ANÁLISIS VECTORIAL GRÁFICO (CON FUENTE SERIF UNIFORME)
+## SECCIÓN III: ANÁLISIS GRÁFICO (RECALIBRACIÓN CROMÁTICA DE VECTORES)
 st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>📊 ANALÍTICA GRÁFICA DE TENDENCIAS</h3>", unsafe_allow_html=True)
 col_graph1, col_graph2 = st.columns(2)
 
-# Configuración base de tipografía limpia para los gráficos de Plotly
 plotly_font_config = dict(family="'CMU Serif', 'Computer Modern', 'Georgia', serif", size=13, color="#333333")
 
 with col_graph1:
-    st.markdown("<p style='font-size: 16px; font-weight: bold; margin-bottom: 5px;'>📈 Evolución Histórica de la Diferencia Absoluta</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 16px; font-weight: bold; margin-bottom: 5px;'>📈 Evolución Histórica de la Diferencia Absoluta (En Verde)</p>", unsafe_allow_html=True)
     fig_linea_diff = px.line(
         st.session_state.registro_historico, x="Corte", y="Diferencia Absoluta",
         markers=True, text="Diferencia Absoluta"
     )
-    fig_linea_diff.update_traces(line_color="#B92C28", line_width=3, textposition="top center")
+    fig_linea_diff.update_traces(line_color="#198754", line_width=3, textposition="top center")  # Vector en Verde
     fig_linea_diff.update_layout(
         font=plotly_font_config,
         margin=dict(t=15, b=15, l=15, r=15), 
@@ -286,7 +288,7 @@ with col_graph2:
     df_torta = pd.DataFrame({"Candidato": [primero["nombre"], segundo["nombre"]], "Votos": [primero["votos"], segundo["votos"]]})
     fig_torta = px.pie(
         df_torta, values="Votos", names="Candidato", hole=0.45,
-        color_discrete_sequence=[primero["color"], segundo["color"]]
+        color_discrete_sequence=[primero["color"], segundo["color"]]  # Azul para el 1ro, Rojo para el 2do
     )
     fig_torta.update_traces(texttemplate="<b>%{percent:.3%}</b><br>%{value:,} votos", textfont_size=13)
     fig_torta.update_layout(
@@ -297,7 +299,7 @@ with col_graph2:
     )
     st.plotly_chart(fig_torta, use_container_width=True)
 
-# Curvas avanzadas de descenso de incertidumbre
+# Curvas de descenso de incertidumbre residual
 col_jee_graph, col_faltante_graph = st.columns(2)
 
 with col_jee_graph:
@@ -336,7 +338,7 @@ with col_faltante_graph:
 
 st.markdown("---")
 
-# Footer institucional de cierre emotivo y de control animado
+# Footer institucional
 st.markdown(
     """
     <div style="position: relative; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 25px; margin-bottom: 10px;">
