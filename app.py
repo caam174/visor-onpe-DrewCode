@@ -101,16 +101,16 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL CONSOLIDADA
+# 2. PARAMETRIZACIÓN NOMINAL CONSOLIDADA (ACTUALIZADO REF: image_853b41.jpg)
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 98.600  
-observadas_jee = 1299     
-corte_temporal = "15/06/2026 11:25:19 a. m."  
+procesadas_porc = 98.613  
+observadas_jee = 1287     
+corte_temporal = "15/06/2026 11:46:00 a. m."  
 
 candidatos = [
-    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "votos": 9075495, "porcentaje": 50.050}, 
-    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "votos": 9057202, "porcentaje": 49.950} 
+    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "votos": 9077116, "porcentaje": 50.052}, 
+    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "votos": 9058190, "porcentaje": 49.948} 
 ]
 
 por_procesar_porc = 100.0 - procesadas_porc
@@ -126,13 +126,14 @@ if "registro_historico" not in st.session_state:
         {"Corte": "13/06 13:25", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686, "Actas JEE": 1498, "Porcentaje Faltante": 3.230},
         {"Corte": "15/06 08:10", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478, "Actas JEE": 1305, "Porcentaje Faltante": 2.814},
         {"Corte": "15/06 10:55", "Keiko": 9075361, "Roberto": 9057036, "Diferencia Absoluta": 18325, "Actas JEE": 1301, "Porcentaje Faltante": 2.802},
-        {"Corte": "15/06 11:25", "Keiko": 9075495, "Roberto": 9057202, "Diferencia Absoluta": 18293, "Actas JEE": 1299, "Porcentaje Faltante": round(faltante_total_inicial, 3)}
+        {"Corte": "15/06 11:25", "Keiko": 9075495, "Roberto": 9057202, "Diferencia Absoluta": 18293, "Actas JEE": 1299, "Porcentaje Faltante": 2.800},
+        {"Corte": "15/06 11:46", "Keiko": 9077116, "Roberto": 9058190, "Diferencia Absoluta": 18926, "Actas JEE": 1287, "Porcentaje Faltante": round(faltante_total_inicial, 3)}
     ])
 
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 98.600))
-        observadas_jee = int(json_data.get("totales_observadas", 1299))
+        procesadas_porc = float(json_data.get("porcentajepros", 98.613))
+        observadas_jee = int(json_data.get("totales_observadas", 1287))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
@@ -168,8 +169,8 @@ candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
 
-primero["color"] = "#0046AD"  # Azul Eléctrico Llamativo
-segundo["color"] = "#D9381E"  # Rojo Alerta Llamativo
+primero["color"] = "#0046AD"  # Azul Eléctrico
+segundo["color"] = "#D9381E"  # Rojo Alerta
 
 diferencia_actual = primero["votos"] - segundo["votos"]
 st.sidebar.info(f"Corte: {corte_temporal}")
@@ -178,7 +179,7 @@ st.sidebar.info(f"Corte: {corte_temporal}")
 # 3. CAPA DE PRESENTACIÓN DE ALTA VISIBILIDAD DE DATOS
 # ==============================================================================
 
-## SECCIÓN I: MARGEN DE POSICIONES REALES (VOTOS VÁLIDOS PROCESADOS)
+## SECCIÓN I: MARGEN DE POSICIONES REALES (VOTOS VÁLIDOS CONTABILIZADOS)
 st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>🥇 ESTADO NOMINAL DE LA CONTIENDA (VOTOS VÁLIDOS CONTABILIZADOS)</h3>", unsafe_allow_html=True)
 col_1er, col_2do = st.columns(2)
 
