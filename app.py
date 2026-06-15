@@ -101,7 +101,7 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL CONSOLIDADA (image_85b7c5.jpg)
+# 2. PARAMETRIZACIÓN NOMINAL CONSOLIDADA
 # ==============================================================================
 total_actas = 92766
 procesadas_porc = 98.600  
@@ -163,13 +163,13 @@ if status_msg == "OK" and json_data:
     except Exception as e:
         st.sidebar.error(f"Error de parsing: {str(e)}")
 
-# Configuración analítica de orden de mérito y paleta llamativa
+# Configuración analítica de orden de mérito actual
 candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True)
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
 
-primero["color"] = "#0046AD"  # Azul Eléctrico Llamativo para el Ganador
-segundo["color"] = "#D9381E"  # Rojo Alerta Llamativo para el Segundo Puesto
+primero["color"] = "#0046AD"  # Azul Eléctrico Llamativo para el Ganador Real
+segundo["color"] = "#D9381E"  # Rojo Alerta Llamativo para el Segundo Puesto Real
 
 diferencia_actual = primero["votos"] - segundo["votos"]
 st.sidebar.info(f"Corte: {corte_temporal}")
@@ -178,8 +178,8 @@ st.sidebar.info(f"Corte: {corte_temporal}")
 # 3. CAPA DE PRESENTACIÓN DE ALTA VISIBILIDAD DE DATOS
 # ==============================================================================
 
-## SECCIÓN I: MARGEN DE POSICIONES (RECALIBRADO TIPOGRÁFICO Y ALINEACIÓN CENTRAL)
-st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>🥇 ESTADO NOMINAL DE LA CONTIENDA (VOTOS VÁLIDOS)</h3>", unsafe_allow_html=True)
+## SECCIÓN I: MARGEN DE POSICIONES REALES
+st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>🥇 ESTADO NOMINAL DE LA CONTIENDA (VOTOS VÁLIDOS VIVOS)</h3>", unsafe_allow_html=True)
 col_1er, col_2do = st.columns(2)
 
 with col_1er:
@@ -218,7 +218,7 @@ with col_2do:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-## SECCIÓN II: MARGEN DE CONTROL MATEMÁTICO (DIFERENCIA EN VERDE DE PRECISIÓN)
+## SECCIÓN II: MARGEN DE CONTROL MATEMÁTICO
 st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>⚖️ PARAMETRÍA ESTRUCTURAL Y BRECHAS</h3>", unsafe_allow_html=True)
 col_dif, col_m1, col_m2 = st.columns([2, 1, 1])
 
@@ -265,7 +265,7 @@ with col_m2:
 st.markdown("<br>", unsafe_allow_html=True)
 
 # ==============================================================================
-# NUEVA SECCIÓN IV: ALGORITMO DE PREDICCIÓN CON REGLAS DE CIERRE AL 100%
+# SECCIÓN IV: ALGORITMO DE PREDICCIÓN CORREGIDO (ORDENAMIENTO DINÁMICO POST-PROYECCIÓN)
 # ==============================================================================
 st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>🔮 PROYECCIÓN ESTADÍSTICA DE TENDENCIA AL 100% DE ACTAS</h3>", unsafe_allow_html=True)
 
@@ -273,11 +273,11 @@ df_hist = st.session_state.registro_historico
 votos_validos_totales = primero["votos"] + segundo["votos"]
 actas_reales_contadas = total_actas * (procesadas_porc / 100.0)
 
-# 1. Ratio promedio de votos válidos por acta física
+# 1. Esperanza matemática de votos por acta
 votos_por_acta = votos_validos_totales / actas_reales_contadas if actas_reales_contadas > 0 else 198.24
 votos_ocultos_estimados = int(observadas_jee * votos_por_acta)
 
-# 2. Análisis cinético de momentum (pendientes de los últimos 3 cortes de datos)
+# 2. Vector cinético de momentum (últimos 3 cortes)
 if len(df_hist) >= 3:
     delta_primero = df_hist.iloc[-1]["Keiko"] - df_hist.iloc[-3]["Keiko"]
     delta_segundo = df_hist.iloc[-1]["Roberto"] - df_hist.iloc[-3]["Roberto"]
@@ -293,30 +293,42 @@ else:
     ratio_momentum_1 = primero["votos"] / votos_validos_totales
     ratio_momentum_2 = segundo["votos"] / votos_validos_totales
 
-# 3. Modelado Predictivo Estocástico (Simulación al 100%)
+# 3. Modelado Predictivo Estocástico Crudo
 votos_p1_proyectados = int(primero["votos"] + (votos_ocultos_estimados * ratio_momentum_1))
 votos_p2_proyectados = int(segundo["votos"] + (votos_ocultos_estimados * ratio_momentum_2))
-universo_proyectado_100 = votos_p1_proyectados + votos_p2_proyectados
 
-porc_p1_100 = (votos_p1_proyectados / universo_proyectado_100) * 100
-porc_p2_100 = (votos_p2_proyectados / universo_proyectado_100) * 100
-dif_proyectada_100 = votos_p1_proyectados - votos_p2_proyectados
+# --- CORRECCIÓN CRÍTICA DE LA IMAGEN image_85439c.png ---
+# Re-evaluamos el orden de mérito de los resultados proyectados antes de pintar la UI
+lista_proyecciones = [
+    {"nombre": primero["nombre"], "votos": votos_p1_proyectados, "color_actual": primero["color"], "bg": "#F4F8FF"},
+    {"nombre": segundo["nombre"], "votos": votos_p2_proyectados, "color_actual": segundo["color"], "bg": "#FFF4F4"}
+]
+# Ordenar de mayor a menor según los votos PROYECTADOS finales
+proyecciones_ordenadas = sorted(lista_proyecciones, key=lambda x: x["votos"], reverse=True)
 
-# 4. Cálculo del Umbral Matemático Crítico de Reversión
+pred_primero = proyecciones_ordenadas[0]
+pred_segundo = proyecciones_ordenadas[1]
+
+universo_proyectado_100 = pred_primero["votos"] + pred_segundo["votos"]
+porc_pred_1 = (pred_primero["votos"] / universo_proyectado_100) * 100
+porc_pred_2 = (pred_segundo["votos"] / universo_proyectado_100) * 100
+dif_proyectada_100 = pred_primero["votos"] - pred_segundo["votos"]
+
+# 4. Umbral de Reversión Estático
 votos_necesarios_reversion = (votos_ocultos_estimados + diferencia_actual) / 2
 porc_necesario_reversion = (votos_necesarios_reversion / votos_ocultos_estimados) * 100 if votos_ocultos_estimados > 0 else 0.0
 
-# Despliegue de la interfaz predictiva
+# Renderizado Dinámico Corregido
 col_pred1, col_pred2, col_pred3 = st.columns([1, 1, 1])
 
 with col_pred1:
     st.markdown(
         f"""
-        <div style="background-color: #F8F9FA; border-left: 4px solid {primero['color']}; padding: 15px; border-radius: 4px;">
-            <span style="font-size: 12px; color: #555555; font-weight: bold;">PROYECCIÓN AL 100% - GANADOR</span>
-            <div style="font-size: 20px; font-weight: bold; color: {primero['color']}; margin-top: 3px;">{primero['nombre']}</div>
-            <div style="font-size: 32px; font-weight: bold; margin-top: 2px;">{porc_p1_100:.3f}%</div>
-            <span style="font-size: 13px; color: #666666;">~ {votos_p1_proyectados:,} votos finales</span>
+        <div style="background-color: {pred_primero['bg']}; border-left: 4px solid {pred_primero['color_actual']}; padding: 15px; border-radius: 4px; min-height: 140px;">
+            <span style="font-size: 12px; color: #555555; font-weight: bold; letter-spacing: 0.5px;">PROYECCIÓN AL 100% - GANADOR PROYECTADO</span>
+            <div style="font-size: 18px; font-weight: bold; color: {pred_primero['color_actual']}; margin-top: 3px;">{pred_primero['nombre']}</div>
+            <div style="font-size: 32px; font-weight: bold; margin-top: 2px;">{porc_pred_1:.3f}%</div>
+            <span style="font-size: 13px; color: #666666;">~ {pred_primero['votos']:,} votos finales</span>
         </div>
         """, unsafe_allow_html=True
     )
@@ -324,11 +336,11 @@ with col_pred1:
 with col_pred2:
     st.markdown(
         f"""
-        <div style="background-color: #F8F9FA; border-left: 4px solid {segundo['color']}; padding: 15px; border-radius: 4px;">
-            <span style="font-size: 12px; color: #555555; font-weight: bold;">PROYECCIÓN AL 100% - SEGUNDO</span>
-            <div style="font-size: 20px; font-weight: bold; color: {segundo['color']}; margin-top: 3px;">{segundo['nombre']}</div>
-            <div style="font-size: 32px; font-weight: bold; margin-top: 2px;">{porc_p2_100:.3f}%</div>
-            <span style="font-size: 13px; color: #666666;">~ {votos_p2_proyectados:,} votos finales</span>
+        <div style="background-color: {pred_segundo['bg']}; border-left: 4px solid {pred_segundo['color_actual']}; padding: 15px; border-radius: 4px; min-height: 140px;">
+            <span style="font-size: 12px; color: #555555; font-weight: bold; letter-spacing: 0.5px;">PROYECCIÓN AL 100% - SEGUNDO PROYECTADO</span>
+            <div style="font-size: 18px; font-weight: bold; color: {pred_segundo['color_actual']}; margin-top: 3px;">{pred_segundo['nombre']}</div>
+            <div style="font-size: 32px; font-weight: bold; margin-top: 2px;">{porc_pred_2:.3f}%</div>
+            <span style="font-size: 13px; color: #666666;">~ {pred_segundo['votos']:,} votos finales</span>
         </div>
         """, unsafe_allow_html=True
     )
@@ -336,11 +348,11 @@ with col_pred2:
 with col_pred3:
     st.markdown(
         f"""
-        <div style="background-color: #F4FBF6; border-left: 4px solid #198754; padding: 15px; border-radius: 4px;">
-            <span style="font-size: 12px; color: #198754; font-weight: bold;">BRECHA FINAL EN EL CIERRE (VERDE)</span>
-            <div style="font-size: 20px; font-weight: bold; color: #198754; margin-top: 3px;">Ventaja Estimada</div>
+        <div class="card-metrica" style="background-color: #F4FBF6; border-left-color: #198754; padding: 20px; min-height: 140px;">
+            <span style="font-size: 12px; color: #198754; font-weight: bold; letter-spacing: 0.5px;">BRECHA PROYECTADA EN EL CIERRE (VERDE)</span>
+            <div style="font-size: 18px; font-weight: bold; color: #198754; margin-top: 3px;">Ventaja del Líder Proyectado</div>
             <div style="font-size: 32px; font-weight: bold; color: #198754; margin-top: 2px;">+{dif_proyectada_100:,}</div>
-            <span style="font-size: 13px; color: #444444;">Votos netos de resguardo</span>
+            <span style="font-size: 13px; color: #444444;">Votos netos de ventaja calculada</span>
         </div>
         """, unsafe_allow_html=True
     )
@@ -348,12 +360,12 @@ with col_pred3:
 st.markdown(
     f"""
     <div style="background-color: #FFF9E6; border: 1px solid #F39C12; border-radius: 6px; padding: 15px; margin-top: 10px;">
-        <h4 style="margin: 0px 0px 5px 0px; color: #B7950B; font-size: 15px;">📊 Dictamen Técnico del Modelo Predictivo (Criterio Estadístico):</h4>
+        <h4 style="margin: 0px 0px 5px 0px; color: #B7950B; font-size: 15px;">📊 Dictamen Técnico del Modelo Predictivo (Criterio de Inversión Estocástica):</h4>
         <p style="margin: 0px; font-size: 14px; line-height: 1.4; color: #333333;">
-            Para que ocurra una reversión del resultado, el candidato del segundo lugar requiere capturar el <b>{porc_necesario_reversion:.3f}%</b> 
-            de los <b>{votos_ocultos_estimados:,}</b> votos estimados que se encuentran bajo revisión en el JEE. 
-            El momentum de los últimos tres cortes computados asigna una captura de flujo real de solo el <b>{ratio_momentum_2*100:.3f}%</b> para el segundo lugar. 
-            <b>Conclusión:</b> La tendencia matemática actual indica que la ventaja del primer lugar es sólida y estadísticamente irreversible.
+            Para consolidar una inversión de tendencia (reversión), el segundo lugar real requiere capturar el <b>{porc_necesario_reversion:.3f}%</b> 
+            de los <b>{votos_ocultos_estimados:,}</b> votos en controversia dentro del JEE. 
+            El momentum cinético integrado asigna una tasa de captura proyectada del <b>{ratio_momentum_2*100:.3f}%</b> a Roberto Sánchez y del <b>{ratio_momentum_1*100:.3f}%</b> a Keiko Fujimori.
+            <b>Resultado de simulación:</b> Si el flujo actual persiste de forma lineal, el ganador proyectado al 100% pasa a ser <b>{pred_primero['nombre']}</b>.
         </p>
     </div>
     """, unsafe_allow_html=True
