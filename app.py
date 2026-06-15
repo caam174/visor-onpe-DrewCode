@@ -24,7 +24,7 @@ st.title("🏛️ Tablero de Control de Escrutinio Oficial (EN VIVO)")
 st.caption("Filtro de precisión analítica con actualización recursiva cada 60 segundos")
 st.markdown("---")
 
-# Endpoint oficial de contingencia (reglas de juego de la API de la ONPE)
+# Endpoint oficial de la ONPE (reglas de juego de la API)
 ONPE_API_REAL = "https://resultadosegundavuelta.onpe.gob.pe/presentacion-backend/resumen/resumenPresidencial"
 
 st.sidebar.header("🛠️ Estado del Pipeline de Datos")
@@ -52,7 +52,7 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. VECTOR HISTÓRICO DE AUDITORÍA ELECTORAL (SECUENCIA ACTUALIZADA)
+# 2. VECTOR HISTÓRICO DE AUDITORÍA ELECTORAL (SECUENCIA COMPLETA)
 # ==============================================================================
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
@@ -70,26 +70,27 @@ if "registro_historico" not in st.session_state:
         {"Corte": "12/06 08:30", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
         {"Corte": "12/06 09:40", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303},
         {"Corte": "12/06 14:55", "Keiko": 9037650, "Roberto": 9036099, "Diferencia Absoluta": 1551},
-        {"Corte": "13/06 13:25", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686}
+        {"Corte": "13/06 13:25", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686},
+        {"Corte": "15/06 08:10", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478}
     ])
 
-# Parámetros nominales estáticos del corte de las 01:25:18 p.m. (image_c336bb.jpg)
+# Parámetros nominales estáticos del corte actual (image_9e315f.jpg)
 total_actas = 92766
-procesadas_porc = 98.385  
-observadas_jee = 1498     
+procesadas_porc = 98.593  
+observadas_jee = 1305     
 pendientes = 0            
-corte_temporal = "13/06/2026 01:25:18 p. m."
+corte_temporal = "15/06/2026 08:10:19 a. m."
 
 candidatos = [
-    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9050366, "porcentaje": 50.021},
-    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9042680, "porcentaje": 49.979}
+    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9075116, "porcentaje": 50.051},
+    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9056638, "porcentaje": 49.949}
 ]
 
 # Sincronización dinámica condicionada al estado de la respuesta API
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 98.385))
-        observadas_jee = int(json_data.get("totales_observadas", 1498))
+        procesadas_porc = float(json_data.get("porcentajepros", 98.593))
+        observadas_jee = int(json_data.get("totales_observadas", 1305))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
