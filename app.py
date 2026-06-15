@@ -1,143 +1,226 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escrutinio Centralizado - Paneles Desplegables</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
-        body {
-            background-color: #090d16;
-            color: #f1f5f9;
-            font-family: ui-sans-serif, system-ui, sans-serif;
-        }
-        /* Remueve la flecha nativa por defecto para estandarizar el diseño */
-        summary::-webkit-details-marker { display: none; }
-        summary { list-style: none; }
-    </style>
-</head>
-<body class="min-h-screen p-4 md:p-8 flex flex-col justify-between">
+import streamlit as st
+import pandas as pd
+import plotly.express as px
+import requests
+import datetime
+import time
 
-    <header class="w-full max-w-6xl mx-auto mb-6 border-b border-slate-800 pb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-                <span>🇵🇪</span> Sistema de Fiscalización y Conteo de Actas
-            </h1>
-            <p class="text-xs text-slate-400 mt-0.5 uppercase tracking-wider font-mono">Estructura Modular con Componentes Colapsables</p>
-        </div>
-        <div class="bg-slate-900 border border-slate-700 px-3 py-1.5 rounded text-right font-mono text-xs text-cyan-400">
-            Sincronización: <span id="live-clock">00:00:00</span>
-        </div>
-    </header>
+# ==============================================================================
+# 1. CONFIGURACIÓN DE INFRAESTRUCTURA Y ENTIDAD VISUAL
+# ==============================================================================
+st.set_page_config(page_title="Control de Escrutinio ONPE", layout="wide")
 
-    <main class="w-full max-w-6xl mx-auto flex flex-col gap-4 my-auto">
+st.markdown(
+    """
+    <div style="text-align: right; color: #000080; font-family: 'CMU Serif', 'Computer Modern', 'Times New Roman', serif; font-weight: bold; font-size: 13px; margin-bottom: -25px; padding-right: 5px;">
+        Elaborado por DrewCode - 2026. Cualquier consulta puedes escribirme a caam174@gmail.com
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+# Corrección segura del bloque de título detectado con error en image_862483.png
+st.markdown(
+    """
+    <h1 style="font-family: 'Arial', sans-serif; font-weight: bold; margin-bottom: 5px;">
+        <span style="vertical-align: middle;">🇵🇪</span> Sistema de Fiscalización y Conteo de Actas
+    </h1>
+    """, 
+    unsafe_allow_html=True
+)
+st.caption("Filtro de precisión analítica con actualización recursiva cada 60 segundos")
+st.markdown("---")
+
+ONPE_API_REAL = "https://resultadosegundavuelta.onpe.gob.pe/presentacion-backend/resumen/resumenPresidencial"
+
+st.sidebar.header("🛠️ Estado del Pipeline de Datos")
+
+@st.cache_data(ttl=10)
+def consumir_api_onpe(url):
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "application/json, text/plain, */*",
+        "Origin": "https://resultadosegundavuelta.onpe.gob.pe",
+        "Referer": "https://resultadosegundavuelta.onpe.gob.pe/"
+    }
+    try:
+        response = requests.get(url, headers=headers, timeout=10)
+        if response.status_code == 200:
+            try:
+                return response.json(), "OK"
+            except Exception:
+                return None, "Bloqueo/HTML detectado en respuesta"
+        return None, f"Error HTTP {response.status_code}"
+    except Exception as e:
+        return None, f"Fallo de Red: {str(e)}"
+
+json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
+
+# ==============================================================================
+# 2. PARAMETRIZACIÓN NOMINAL Y AUDITORÍA VECTORIAL
+# ==============================================================================
+total_actas = 92766
+procesadas_porc = 98.598  
+observadas_jee = 1301     
+corte_temporal = "15/06/2026 10:55:19 a. m."
+
+candidatos = [
+    {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": 9075361, "porcentaje": 50.051},
+    {"nombre": "Roberto Helbert Sánchez Palomino", "votos": 9057036, "porcentaje": 49.949}
+]
+
+por_procesar_porc = 100.0 - procesadas_porc
+jee_porc = (observadas_jee / total_actas) * 100
+faltante_total_inicial = por_procesar_porc + jee_porc  
+
+if "registro_historico" not in st.session_state:
+    st.session_state.registro_historico = pd.DataFrame([
+        {"Corte": "11/06 09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561, "Actas JEE": 1650, "Porcentaje Faltante": 3.629},
+        {"Corte": "11/06 12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922, "Actas JEE": 1640, "Porcentaje Faltante": 3.588},
+        {"Corte": "11/06 13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859, "Actas JEE": 1628, "Porcentaje Faltante": 3.525},
+        {"Corte": "12/06 07:55", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303, "Actas JEE": 1607, "Porcentaje Faltante": 3.473},
+        {"Corte": "13/06 13:25", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686, "Actas JEE": 1498, "Porcentaje Faltante": 3.230},
+        {"Corte": "15/06 08:10", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478, "Actas JEE": 1305, "Porcentaje Faltante": 2.814},
+        {"Corte": "15/06 08:30", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478, "Actas JEE": 1305, "Porcentaje Faltante": 2.814},
+        {"Corte": "15/06 10:55", "Keiko": 9075361, "Roberto": 9057036, "Diferencia Absoluta": 18325, "Actas JEE": 1301, "Porcentaje Faltante": round(faltante_total_inicial, 3)}
+    ])
+
+if status_msg == "OK" and json_data:
+    try:
+        procesadas_porc = float(json_data.get("porcentajepros", 98.598))
+        observadas_jee = int(json_data.get("totales_observadas", 1301))
+        lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
-        <details open class="group bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden transition-all duration-300">
-            <summary class="flex items-center justify-between p-5 bg-gradient-to-r from-slate-900 to-slate-850 cursor-pointer select-none border-b border-slate-800/50 group-open:border-amber-500/20">
-                <div class="flex items-center gap-3">
-                    <span class="text-amber-400">📊</span>
-                    <h2 class="text-md font-bold text-slate-200 uppercase tracking-wide font-mono">
-                        Monitoreo de Brecha de Actas Impugnadas
-                    </h2>
-                </div>
-                <span class="text-xs text-slate-400 font-mono transition-transform duration-300 group-open:rotate-180">
-                    ▼
-                </span>
-            </summary>
+        if lista_api and len(lista_api) >= 2:
+            votos_k = int(str(lista_api[0].get("votos")).replace(",", ""))
+            votos_r = int(str(lista_api[1].get("votos")).replace(",", ""))
+            candidatos = [
+                {"nombre": "Keiko Sofía Fujimori Higuchi", "votos": votos_k, "porcentaje": float(lista_api[0].get("porcentaje"))},
+                {"nombre": "Roberto Helbert Sánchez Palomino", "votos": votos_r, "porcentaje": float(lista_api[1].get("porcentaje"))}
+            ]
+            corte_temporal = "Sincronizado en Tiempo Real"
             
-            <div class="p-6 font-mono bg-slate-950/40 grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800">
-                    <span class="text-xs text-slate-400 uppercase">1. Carga Inicial Impugnada</span>
-                    <div id="actas-iniciales" class="text-3xl font-bold text-white mt-2">0</div>
-                </div>
-                <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800">
-                    <span class="text-xs text-slate-400 uppercase">2. Resueltas por el JEE</span>
-                    <div id="actas-procesadas" class="text-3xl font-bold text-emerald-400 mt-2">0</div>
-                </div>
-                <div class="bg-amber-950/20 p-4 rounded-xl border border-amber-500/30 shadow-inner">
-                    <span class="text-xs text-amber-400 uppercase font-bold">3. Actas Pendientes (Brecha)</span>
-                    <div id="actas-pendientes" class="text-3xl font-bold text-white mt-2">0</div>
-                </div>
-            </div>
-        </details>
-
-        <details class="group bg-slate-900/50 border border-slate-800 rounded-2xl overflow-hidden transition-all duration-300">
-            <summary class="flex items-center justify-between p-5 bg-gradient-to-r from-slate-900 to-slate-850 cursor-pointer select-none border-b border-slate-800/50 group-open:border-cyan-500/20">
-                <div class="flex items-center gap-3">
-                    <span class="text-cyan-400">⚖️</span>
-                    <h2 class="text-md font-bold text-slate-200 uppercase tracking-wide font-mono">
-                        Cuadrado del Acta y Consistencia de Votos
-                    </h2>
-                </div>
-                <span class="text-xs text-slate-400 font-mono transition-transform duration-300 group-open:rotate-180">
-                    ▼
-                </span>
-            </summary>
+            por_procesar_porc = 100.0 - procesadas_porc
+            jee_porc = (observadas_jee / total_actas) * 100
+            faltante_total_actual = por_procesar_porc + jee_porc
             
-            <div class="p-6 font-mono bg-slate-950/40 grid grid-cols-1 sm:grid-cols-4 gap-4 text-center">
-                <div class="bg-slate-950/80 p-3 rounded border border-slate-800">
-                    <div class="text-xs text-slate-400">Votos Válidos</div>
-                    <div id="votos-validos" class="text-xl font-bold text-slate-200 mt-1">0</div>
-                </div>
-                <div class="bg-slate-950/80 p-3 rounded border border-slate-800">
-                    <div class="text-xs text-slate-400">Votos Blanco</div>
-                    <div id="votos-blanco" class="text-xl font-bold text-slate-200 mt-1">0</div>
-                </div>
-                <div class="bg-slate-950/80 p-3 rounded border border-slate-800">
-                    <div class="text-xs text-slate-400">Votos Nulos</div>
-                    <div id="votos-nulos" class="text-xl font-bold text-slate-200 mt-1">0</div>
-                </div>
-                <div class="bg-cyan-950/20 p-3 rounded border border-cyan-500/30">
-                    <div class="text-xs text-cyan-400 font-bold">Total Emitidos</div>
-                    <div id="votos-totales" class="text-xl font-bold text-cyan-300 mt-1">0</div>
-                </div>
-            </div>
-        </details>
+            df_actual = st.session_state.registro_historico
+            if not df_actual.empty and df_actual.iloc[-1]["Keiko"] != votos_k:
+                fecha_hora_viva = datetime.datetime.now().strftime("%d/%m %H:%M")
+                nueva_fila = pd.DataFrame([{
+                    "Corte": fecha_hora_viva, 
+                    "Keiko": votos_k, 
+                    "Roberto": votos_r, 
+                    "Diferencia Absoluta": abs(votos_k - votos_r),
+                    "Actas JEE": observadas_jee,
+                    "Porcentaje Faltante": round(faltante_total_actual, 3)
+                }])
+                st.session_state.registro_historico = pd.concat([df_actual, nueva_fila], ignore_index=True)
+    except Exception as e:
+        st.sidebar.error(f"Error de parsing: {str(e)}")
 
-    </main>
+# ==============================================================================
+# 3. CAPA DE PRESENTACIÓN VISUAL
+# ==============================================================================
+candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True)
+primero = candidatos_ordenados[0]
+segundo = candidatos_ordenados[1]
+diferencia_actual = primero["votos"] - segundo["votos"]
 
-    <footer class="w-full max-w-6xl mx-auto text-center text-[11px] text-slate-600 font-mono mt-6 border-t border-slate-900 pt-4">
-        Validación Algorítmica Basada en Ley Orgánica de Elecciones | Restricción de Integridad Cerrada.
-    </footer>
+st.sidebar.info(f"Último corte cargado: {corte_temporal}")
 
-    <script>
-        function initClock() {
-            const clockEl = document.getElementById('live-clock');
-            setInterval(() => {
-                const now = new Date();
-                clockEl.innerText = now.toLocaleTimeString('es-PE', { hour12: false });
-            }, 1000);
-        }
+## SECCIÓN I: MARGEN DE POSICIONES
+st.markdown("### 🥇 ESTADO DE LA CONTIENDA (VOTOS VÁLIDOS EMITIDOS)")
+col_1er, col_2do = st.columns(2)
+with col_1er:
+    st.error("🏆 PRIMER LUGAR")
+    st.markdown(f"### **{primero['nombre']}**")
+    st.markdown(f"<h1 style='color: #F39C12; font-size: 38px;'>{primero['votos']:,} <span style='font-size: 20px; color: gray;'>votos ({primero['porcentaje']:.3f}%)</span></h1>", unsafe_allow_html=True)
 
-        const DATA_STORE = {
-            actasImpugnadasIniciales: 2450, 
-            actasImpugnadasProcesadas: 1820,
-            votosValidos: 4520300,
-            votosBlanco: 120450,
-            votosNulos: 340120
-        };
+with col_2do:
+    st.info("🥈 SEGUNDO LUGAR")
+    st.markdown(f"### **{segundo['nombre']}**")
+    st.markdown(f"<h1 style='color: #1ABC9C; font-size: 38px;'>{segundo['votos']:,} <span style='font-size: 20px; color: gray;'>votos ({segundo['porcentaje']:.3f}%)</span></h1>", unsafe_allow_html=True)
 
-        function renderDashboard() {
-            const iniciales = DATA_STORE.actasImpugnadasIniciales;
-            const procesadas = DATA_STORE.actasImpugnadasProcesadas;
-            const brechaAbsoluta = iniciales - procesadas;
+st.markdown("---")
 
-            document.getElementById('actas-iniciales').innerText = iniciales.toLocaleString('es-PE');
-            document.getElementById('actas-procesadas').innerText = procesadas.toLocaleString('es-PE');
-            document.getElementById('actas-pendientes').innerText = brechaAbsoluta.toLocaleString('es-PE');
+## SECCIÓN II: MÉTRICAS ESTRUCTURALES
+st.markdown("### ⚖️ MARGEN DE CONTROL")
+col_dif, col_actas = st.columns([2, 1])
 
-            const totales = DATA_STORE.votosValidos + DATA_STORE.votosBlanco + DATA_STORE.votosNulos;
+with col_dif:
+    st.subheader("Diferencia Absoluta de Votos")
+    st.markdown(f"<p style='font-size: 48px; font-weight: bold; color: #E74C3C; margin: 0;'>{diferencia_actual:,} <span style='font-size: 20px; font-weight: normal; color: gray;'>votos de ventaja</span></p>", unsafe_allow_html=True)
+    st.caption(f"Brecha matemática actual del primer lugar sobre el segundo lugar.")
 
-            document.getElementById('votos-validos').innerText = DATA_STORE.votosValidos.toLocaleString('es-PE');
-            document.getElementById('votos-blanco').innerText = DATA_STORE.votosBlanco.toLocaleString('es-PE');
-            document.getElementById('votos-nulos').innerText = DATA_STORE.votosNulos.toLocaleString('es-PE');
-            document.getElementById('votos-totales').innerText = totales.toLocaleString('es-PE');
-        }
+with col_actas:
+    st.metric(label="📊 Avance de Actas Procesadas", value=f"{procesadas_porc:.3f}%", delta=f"{total_actas:,} Totales")
+    st.metric(label="📂 Actas en el JEE (Impugnadas/Stock)", value=f"{observadas_jee:,}", delta=f"{jee_porc:.3f}% del total")
 
-        window.onload = () => {
-            initClock();
-            renderDashboard();
-        };
-    </script>
-</body>
-</html>
+st.markdown("---")
+
+## SECCIÓN III: ANÁLISIS GRÁFICO VECTORIAL
+st.markdown("### 📊 VISUALIZACIÓN ANALÍTICA DEL ESCRUTINIO")
+col_graph1, col_graph2 = st.columns(2)
+
+with col_graph1:
+    st.markdown("#### 📈 Evolución Real de la Diferencia Absoluta")
+    fig_linea_diff = px.line(
+        st.session_state.registro_historico, x="Corte", y="Diferencia Absoluta",
+        markers=True, text="Diferencia Absoluta"
+    )
+    fig_linea_diff.update_traces(line_color="#E74C3C", line_width=3, textposition="top center")
+    fig_linea_diff.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=280, xaxis=dict(type='category'))
+    st.plotly_chart(fig_linea_diff, use_container_width=True)
+
+with col_graph2:
+    st.markdown("#### 📉 Distribución Porcentual del Voto Válido Actual")
+    df_torta = pd.DataFrame({"Candidato": [primero["nombre"], segundo["nombre"]], "Votos": [primero["votos"], segundo["votos"]]})
+    fig_torta = px.pie(
+        df_torta, values="Votos", names="Candidato", hole=0.4,
+        color_discrete_sequence=["#F39C12", "#1ABC9C"]
+    )
+    fig_torta.update_traces(texttemplate="%{percent:.3%}<br>%{value:,} votos")
+    fig_torta.update_layout(showlegend=False, margin=dict(t=10, b=10, l=10, r=10), height=280)
+    st.plotly_chart(fig_torta, use_container_width=True)
+
+# Cobertura remanente con curvas de descenso analíticas
+st.markdown("### 🔍 AUDITORÍA DE ACTAS EN EL JEE Y COBERTURA REMANENTE RECALIBRADA")
+col_jee_graph, col_faltante_graph = st.columns(2)
+
+with col_jee_graph:
+    st.markdown("#### Curva de Descenso: Actas Físicas en el JEE")
+    fig_jee = px.line(
+        st.session_state.registro_historico, x="Corte", y="Actas JEE",
+        markers=True, text="Actas JEE"
+    )
+    fig_jee.update_traces(line_color="#2980B9", line_width=3, textposition="top center")
+    fig_jee.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=280, xaxis=dict(type='category'))
+    st.plotly_chart(fig_jee, use_container_width=True)
+
+with col_faltante_graph:
+    st.markdown("#### Curva de Cierre: Brecha de Incertidumbre Real (% Faltante Consolidado)")
+    fig_faltante = px.area(
+        st.session_state.registro_historico, x="Corte", y="Porcentaje Faltante",
+        markers=True, text="Porcentaje Faltante"
+    )
+    fig_faltante.update_traces(line_color="#8E44AD", texttemplate="%{text:.3f}%", textposition="top center")
+    fig_faltante.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=280, xaxis=dict(type='category'))
+    st.plotly_chart(fig_faltante, use_container_width=True)
+
+st.markdown("---")
+
+st.markdown(
+    """
+    <div style="position: relative; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 30px; margin-bottom: 10px;">
+        <span style="font-size: 110px; color: #E74C3C; filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.15)); line-height: 1;">❤️</span>
+        <div style="position: absolute; top: 43%; left: 50%; transform: translate(-50%, -50%); color: #FFFFFF; font-weight: bold; font-family: 'Arial', sans-serif; font-size: 14px; letter-spacing: 0.5px; text-shadow: 1px 1px 2px rgba(0,0,0,0.4);">
+            Changuito
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+time.sleep(60)
+st.rerun()
