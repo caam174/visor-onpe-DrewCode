@@ -101,16 +101,16 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL CONSOLIDADA (ACTUALIZADO REF: image_835b25.jpg)
+# 2. PARAMETRIZACIÓN NOMINAL CONSOLIDADA (ACTUALIZADO REF: image_f9bda0.jpg)
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 98.626  
-observadas_jee = 1275     
-corte_temporal = "15/06/2026 01:00:19 p. m."  
+procesadas_porc = 99.033  
+observadas_jee = 897     
+corte_temporal = "16/06/2026 07:45:25 a. m."  
 
 candidatos = [
-    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "votos": 9078181, "porcentaje": 50.052}, 
-    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "votos": 9059279, "porcentaje": 49.948} 
+    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "votos": 9123301, "porcentaje": 50.090}, 
+    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "votos": 9090392, "porcentaje": 49.910} 
 ]
 
 por_procesar_porc = 100.0 - procesadas_porc
@@ -128,13 +128,14 @@ if "registro_historico" not in st.session_state:
         {"Corte": "15/06 10:55", "Keiko": 9075361, "Roberto": 9057036, "Diferencia Absoluta": 18325, "Actas JEE": 1301, "Porcentaje Faltante": 2.802},
         {"Corte": "15/06 11:25", "Keiko": 9075495, "Roberto": 9057202, "Diferencia Absoluta": 18293, "Actas JEE": 1299, "Porcentaje Faltante": 2.800},
         {"Corte": "15/06 11:46", "Keiko": 9077116, "Roberto": 9058190, "Diferencia Absoluta": 18926, "Actas JEE": 1287, "Porcentaje Faltante": 2.761},
-        {"Corte": "15/06 13:00", "Keiko": 9078181, "Roberto": 9059279, "Diferencia Absoluta": 18902, "Actas JEE": 1275, "Porcentaje Faltante": round(faltante_total_inicial, 3)}
+        {"Corte": "15/06 13:00", "Keiko": 9078181, "Roberto": 9059279, "Diferencia Absoluta": 18902, "Actas JEE": 1275, "Porcentaje Faltante": 2.744},
+        {"Corte": "16/06 07:45", "Keiko": 9123301, "Roberto": 9090392, "Diferencia Absoluta": 32909, "Actas JEE": 897, "Porcentaje Faltante": round(faltante_total_inicial, 3)}
     ])
 
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 98.626))
-        observadas_jee = int(json_data.get("totales_observadas", 1275))
+        procesadas_porc = float(json_data.get("porcentajepros", 99.033))
+        observadas_jee = int(json_data.get("totales_observadas", 897))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
