@@ -60,7 +60,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Encabezado corregido: Centrado y libre de prefijos
+# Encabezado principal
 st.markdown(
     """
     <div style="margin-bottom: 25px; text-align: center;">
@@ -101,7 +101,7 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL CONSOLIDADA (ACTUALIZADO REF: image_f9bda0.jpg)
+# 2. PARAMETRIZACIÓN NOMINAL ACUMULADA (REF: image_f9bda0.jpg)
 # ==============================================================================
 total_actas = 92766
 procesadas_porc = 99.033  
@@ -117,19 +117,14 @@ por_procesar_porc = 100.0 - procesadas_porc
 jee_porc = (observadas_jee / total_actas) * 100
 faltante_total_inicial = por_procesar_porc + jee_porc  
 
+# Estructuración de Serie de Tiempo con acumulación neta por día completo
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
-        {"Corte": "11/06 09:40", "Keiko": 9032653, "Roberto": 9032092, "Diferencia Absoluta": 561, "Actas JEE": 1650, "Porcentaje Faltante": 3.629},
-        {"Corte": "11/06 12:30", "Keiko": 9033584, "Roberto": 9032662, "Diferencia Absoluta": 922, "Actas JEE": 1640, "Porcentaje Faltante": 3.588},
-        {"Corte": "11/06 13:35", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859, "Actas JEE": 1628, "Porcentaje Faltante": 3.525},
-        {"Corte": "12/06 07:55", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303, "Actas JEE": 1607, "Porcentaje Faltante": 3.473},
-        {"Corte": "13/06 13:25", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686, "Actas JEE": 1498, "Porcentaje Faltante": 3.230},
-        {"Corte": "15/06 08:10", "Keiko": 9075116, "Roberto": 9056638, "Diferencia Absoluta": 18478, "Actas JEE": 1305, "Porcentaje Faltante": 2.814},
-        {"Corte": "15/06 10:55", "Keiko": 9075361, "Roberto": 9057036, "Diferencia Absoluta": 18325, "Actas JEE": 1301, "Porcentaje Faltante": 2.802},
-        {"Corte": "15/06 11:25", "Keiko": 9075495, "Roberto": 9057202, "Diferencia Absoluta": 18293, "Actas JEE": 1299, "Porcentaje Faltante": 2.800},
-        {"Corte": "15/06 11:46", "Keiko": 9077116, "Roberto": 9058190, "Diferencia Absoluta": 18926, "Actas JEE": 1287, "Porcentaje Faltante": 2.761},
-        {"Corte": "15/06 13:00", "Keiko": 9078181, "Roberto": 9059279, "Diferencia Absoluta": 18902, "Actas JEE": 1275, "Porcentaje Faltante": 2.744},
-        {"Corte": "16/06 07:45", "Keiko": 9123301, "Roberto": 9090392, "Diferencia Absoluta": 32909, "Actas JEE": 897, "Porcentaje Faltante": round(faltante_total_inicial, 3)}
+        {"Día": "11/06", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859, "Actas JEE": 1628, "Porcentaje Faltante": 3.525, "Observación": ""},
+        {"Día": "12/06", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303, "Actas JEE": 1607, "Porcentaje Faltante": 3.473, "Observación": ""},
+        {"Día": "13/06", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686, "Actas JEE": 1498, "Porcentaje Faltante": 3.230, "Observación": ""},
+        {"Día": "15/06", "Keiko": 9078181, "Roberto": 9059279, "Diferencia Absoluta": 18902, "Actas JEE": 1275, "Porcentaje Faltante": 2.744, "Observación": ""},
+        {"Día": "16/06", "Keiko": 9123301, "Roberto": 9090392, "Diferencia Absoluta": 32909, "Actas JEE": 897, "Porcentaje Faltante": round(faltante_total_inicial, 3), "Observación": "Corte hasta 07:45:25 a. m."}
     ])
 
 if status_msg == "OK" and json_data:
@@ -151,18 +146,15 @@ if status_msg == "OK" and json_data:
             jee_porc = (observadas_jee / total_actas) * 100
             faltante_total_actual = por_procesar_porc + jee_porc
             
+            # Actualización sobre el nodo del día actual en ejecución
             df_actual = st.session_state.registro_historico
-            if not df_actual.empty and df_actual.iloc[-1]["Keiko"] != votos_k:
-                fecha_hora_viva = datetime.datetime.now().strftime("%d/%m %H:%M")
-                nueva_fila = pd.DataFrame([{
-                    "Corte": fecha_hora_viva, 
-                    "Keiko": votos_k, 
-                    "Roberto": votos_r, 
-                    "Diferencia Absoluta": abs(votos_k - votos_r),
-                    "Actas JEE": observadas_jee,
-                    "Porcentaje Faltante": round(faltante_total_actual, 3)
-                }])
-                st.session_state.registro_historico = pd.concat([df_actual, nueva_fila], ignore_index=True)
+            df_actual.loc[df_actual["Día"] == "16/06", "Keiko"] = votos_k
+            df_actual.loc[df_actual["Día"] == "16/06", "Roberto"] = votos_r
+            df_actual.loc[df_actual["Día"] == "16/06", "Diferencia Absoluta"] = abs(votos_k - votos_r)
+            df_actual.loc[df_actual["Día"] == "16/06", "Actas JEE"] = observadas_jee
+            df_actual.loc[df_actual["Día"] == "16/06", "Porcentaje Faltante"] = round(faltante_total_actual, 3)
+            df_actual.loc[df_actual["Día"] == "16/06", "Observación"] = f"Corte dinámico: {datetime.datetime.now().strftime('%H:%M:%S')}"
+            st.session_state.registro_historico = df_actual
     except Exception as e:
         st.sidebar.error(f"Error de parsing: {str(e)}")
 
@@ -171,11 +163,20 @@ candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
 
-primero["color"] = "#0046AD"  # Azul Eléctrico
-segundo["color"] = "#D9381E"  # Rojo Alerta
+primero["color"] = "#0046AD"  
+segundo["color"] = "#D9381E"  
 
 diferencia_actual = primero["votos"] - segundo["votos"]
-st.sidebar.info(f"Corte: {corte_temporal}")
+st.sidebar.info(f"Corte base: {corte_temporal}")
+
+# Generación de la columna de texto combinado para el gráfico (Votos + Observación del corte)
+def construir_etiqueta(row):
+    base = f"{row['Diferencia Absoluta']:,}"
+    if row["Observación"]:
+        return f"{base}<br><span style='font-size:10px; font-weight:bold; color:#002244;'>⚠️ {row['Observación']}</span>"
+    return base
+
+st.session_state.registro_historico["Etiqueta_Grafico"] = st.session_state.registro_historico.apply(construir_etiqueta, axis=1)
 
 # ==============================================================================
 # 3. CAPA DE PRESENTACIÓN DE ALTA VISIBILIDAD DE DATOS
@@ -234,7 +235,7 @@ with col_dif:
                 {diferencia_actual:,} <span style="font-size: 24px; font-weight: normal; color: #444444;">Votos de Diferencia</span>
             </div>
             <p style="font-size: 14px; color: #555555; margin-top: 8px; margin-bottom: 0px; font-style: italic;">
-                Margen neto de resguardo frente al volumen pendiente de resolución en los JEE.
+                Margen neto de resguardo frente al volumen acumulado pendiente en los JEE.
             </p>
         </div>
         """,
@@ -267,25 +268,32 @@ with col_m2:
 
 st.markdown("<br><hr>", unsafe_allow_html=True)
 
-## SECCIÓN III: ANÁLISIS GRÁFICO (VECTORES CROMÁTICOS DE TENDENCIA REAL)
-st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>📊 ANALÍTICA GRÁFICA DE TENDENCIAS REALES</h3>", unsafe_allow_html=True)
+## SECCIÓN III: ANÁLISIS GRÁFICO (CONSOLIDACIÓN DIARIA)
+st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>📊 ANALÍTICA GRÁFICA DE TENDENCIAS REALES ACUMULADAS</h3>", unsafe_allow_html=True)
 col_graph1, col_graph2 = st.columns(2)
 
 plotly_font_config = dict(family="'CMU Serif', 'Computer Modern', 'Georgia', serif", size=13, color="#333333")
 
 with col_graph1:
-    st.markdown("<p style='font-size: 16px; font-weight: bold; margin-bottom: 5px;'>📈 Evolución Histórica de la Diferencia Absoluta (En Verde)</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 16px; font-weight: bold; margin-bottom: 5px;'>📈 Evolución Histórica de la Diferencia Absoluta (Acumulado por Día)</p>", unsafe_allow_html=True)
+    
+    # Gráfico ajustado por día con etiquetas de texto enriquecidas para las observaciones
     fig_linea_diff = px.line(
-        st.session_state.registro_historico, x="Corte", y="Diferencia Absoluta",
-        markers=True, text="Diferencia Absoluta"
+        st.session_state.registro_historico, x="Día", y="Diferencia Absoluta",
+        markers=True, text="Etiqueta_Grafico"
     )
-    fig_linea_diff.update_traces(line_color="#198754", line_width=3, textposition="top center")  
+    fig_linea_diff.update_traces(
+        line_color="#198754", 
+        line_width=4, 
+        textposition="top center",
+        marker=dict(size=10, line=dict(width=2, color='white'))
+    )  
     fig_linea_diff.update_layout(
         font=plotly_font_config,
-        margin=dict(t=15, b=15, l=15, r=15), 
-        height=300, 
-        xaxis=dict(type='category', gridcolor='#F0F0F0'),
-        yaxis=dict(gridcolor='#F0F0F0'),
+        margin=dict(t=30, b=15, l=15, r=15), 
+        height=340, 
+        xaxis=dict(type='category', gridcolor='#F0F0F0', title="Jornada de Cómputo (Día)"),
+        yaxis=dict(gridcolor='#F0F0F0', title="Brecha de Votos"),
         plot_bgcolor='white'
     )
     st.plotly_chart(fig_linea_diff, use_container_width=True)
@@ -297,28 +305,28 @@ with col_graph2:
         df_torta, values="Votos", names="Candidato", hole=0.45,
         color_discrete_sequence=[primero["color"], segundo["color"]]  
     )
-    fig_torta.update_traces(texttemplate="<b>%{percent:.3%}</b><br>%{value:,} votos", textfont_size=13)
+    fig_torta.update_traces(texttemplate="<b>%{{percent:.3%}}</b><br>%{{value:,}} votos", textfont_size=13)
     fig_torta.update_layout(
         font=plotly_font_config,
         showlegend=False, 
         margin=dict(t=15, b=15, l=15, r=15), 
-        height=300
+        height=340
     )
     st.plotly_chart(fig_torta, use_container_width=True)
 
-# Curvas de descenso de incertidumbre residual histórica
+# Curvas complementarias con la estructura unificada por día
 col_jee_graph, col_faltante_graph = st.columns(2)
 
 with col_jee_graph:
-    st.markdown("<p style='font-size: 16px; font-weight: bold; margin-bottom: 5px;'>📂 Ritmo de Desembalse: Historial de Actas en JEE</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 16px; font-weight: bold; margin-bottom: 5px;'>📂 Ritmo de Desembalse: Historial de Actas en JEE (Por Día)</p>", unsafe_allow_html=True)
     fig_jee = px.line(
-        st.session_state.registro_historico, x="Corte", y="Actas JEE",
+        st.session_state.registro_historico, x="Día", y="Actas JEE",
         markers=True, text="Actas JEE"
     )
     fig_jee.update_traces(line_color="#2980B9", line_width=3, textposition="top center")
     fig_jee.update_layout(
         font=plotly_font_config,
-        margin=dict(t=15, b=15, l=15, r=15), 
+        margin=dict(t=25, b=15, l=15, r=15), 
         height=300, 
         xaxis=dict(type='category', gridcolor='#F0F0F0'),
         yaxis=dict(gridcolor='#F0F0F0'),
@@ -327,15 +335,15 @@ with col_jee_graph:
     st.plotly_chart(fig_jee, use_container_width=True)
 
 with col_faltante_graph:
-    st.markdown("<p style='font-size: 16px; font-weight: bold; margin-bottom: 5px;'>📉 Curva de Cierre: Incertidumbre Total Pendiente (%)</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 16px; font-weight: bold; margin-bottom: 5px;'>📉 Curva de Cierre: Incertidumbre Total Pendiente (Por Día %)</p>", unsafe_allow_html=True)
     fig_faltante = px.area(
-        st.session_state.registro_historico, x="Corte", y="Porcentaje Faltante",
+        st.session_state.registro_historico, x="Día", y="Porcentaje Faltante",
         markers=True, text="Porcentaje Faltante"
     )
-    fig_faltante.update_traces(line_color="#8E44AD", texttemplate="<b>%{text:.3f}%</b>", textposition="top center")
+    fig_faltante.update_traces(line_color="#8E44AD", texttemplate="<b>%{{text:.3f}}%</b>", textposition="top center")
     fig_faltante.update_layout(
         font=plotly_font_config,
-        margin=dict(t=15, b=15, l=15, r=15), 
+        margin=dict(t=25, b=15, l=15, r=15), 
         height=300, 
         xaxis=dict(type='category', gridcolor='#F0F0F0'),
         yaxis=dict(gridcolor='#F0F0F0'),
