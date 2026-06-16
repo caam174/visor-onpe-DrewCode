@@ -268,7 +268,7 @@ with col_m2:
 
 st.markdown("<br><hr>", unsafe_allow_html=True)
 
-## SECCIÓN III: ANÁLISIS GRÁFICO (CONSOLIDACIÓN DIARIA)
+## SECCIÓN III: ANÁLISIS GRÁFICO (CONSOLIDACIÓN DIARIA CORREGIDA)
 st.markdown("<h3 style='font-size: 24px; letter-spacing: 0.5px; margin-bottom: 15px;'>📊 ANALÍTICA GRÁFICA DE TENDENCIAS REALES ACUMULADAS</h3>", unsafe_allow_html=True)
 col_graph1, col_graph2 = st.columns(2)
 
@@ -277,7 +277,6 @@ plotly_font_config = dict(family="'CMU Serif', 'Computer Modern', 'Georgia', ser
 with col_graph1:
     st.markdown("<p style='font-size: 16px; font-weight: bold; margin-bottom: 5px;'>📈 Evolución Histórica de la Diferencia Absoluta (Acumulado por Día)</p>", unsafe_allow_html=True)
     
-    # Gráfico ajustado por día con etiquetas de texto enriquecidas para las observaciones
     fig_linea_diff = px.line(
         st.session_state.registro_historico, x="Día", y="Diferencia Absoluta",
         markers=True, text="Etiqueta_Grafico"
@@ -305,7 +304,8 @@ with col_graph2:
         df_torta, values="Votos", names="Candidato", hole=0.45,
         color_discrete_sequence=[primero["color"], segundo["color"]]  
     )
-    fig_torta.update_traces(texttemplate="<b>%{{percent:.3%}}</b><br>%{{value:,}} votos", textfont_size=13)
+    # FIX: Corregido de %{{...}} a %{...} para evitar el error de renderizado
+    fig_torta.update_traces(texttemplate="<b>%{percent:.3%}</b><br>%{value:,} votos", textfont_size=13)
     fig_torta.update_layout(
         font=plotly_font_config,
         showlegend=False, 
@@ -340,7 +340,8 @@ with col_faltante_graph:
         st.session_state.registro_historico, x="Día", y="Porcentaje Faltante",
         markers=True, text="Porcentaje Faltante"
     )
-    fig_faltante.update_traces(line_color="#8E44AD", texttemplate="<b>%{{text:.3f}}%</b>", textposition="top center")
+    # FIX: Corregido de %{{...}} a %{...} para evitar el error de renderizado
+    fig_faltante.update_traces(line_color="#8E44AD", texttemplate="<b>%{text:.3f}%</b>", textposition="top center")
     fig_faltante.update_layout(
         font=plotly_font_config,
         margin=dict(t=25, b=15, l=15, r=15), 
