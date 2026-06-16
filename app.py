@@ -110,37 +110,37 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL FIJADA SEGÚN ESCRUTINIO REAL
+# 2. PARAMETRIZACIÓN NOMINAL ACTUALIZADA SEGÚN IMAGE_DEDC1F.JPG
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 99.033    
-observadas_jee = 897       
-actas_contabilizadas = 91869  
+procesadas_porc = 99.082      # Actualizado de image_dedc1f.jpg
+observadas_jee = 852         # Actualizado de image_dedc1f.jpg
+actas_contabilizadas = 91914  # Actualizado de image_dedc1f.jpg
 actas_pendientes = 0       
-corte_temporal = "16/06/2026 A LAS 08:20:19 a. m."  
+corte_temporal = "16/06/2026 A LAS 12:35:25 p. m."  # Sincronizado con el nuevo corte oficial
 
 candidatos = [
-    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9123301, "porcentaje": 50.090, "color": "#F15A24"}, 
-    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9090392, "porcentaje": 49.910, "color": "#009245"} 
+    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9129316, "porcentaje": 50.097, "color": "#F15A24"}, # Actualizado
+    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9093792, "porcentaje": 49.903, "color": "#009245"} # Actualizado
 ]
 
-jee_porc = 0.967  
+jee_porc = 0.918  # Actualizado de la faja oficial
 pendiente_porc = 0.000
 
-# Inicialización de la Serie de Tiempo Consolidada Diaria
+# Inicialización y actualización de la Serie de Tiempo Consolidada Diaria
 if "registro_historico" not in st.session_state:
     st.session_state.registro_historico = pd.DataFrame([
         {"Día": "11/06", "Keiko": 9034070, "Roberto": 9033211, "Diferencia Absoluta": 859, "Actas JEE": 1628, "Porcentaje Faltante": 3.525, "Observación": ""},
         {"Día": "12/06", "Keiko": 9036046, "Roberto": 9034743, "Diferencia Absoluta": 1303, "Actas JEE": 1607, "Porcentaje Faltante": 3.473, "Observación": ""},
         {"Día": "13/06", "Keiko": 9050366, "Roberto": 9042680, "Diferencia Absoluta": 7686, "Actas JEE": 1498, "Porcentaje Faltante": 3.230, "Observación": ""},
         {"Día": "15/06", "Keiko": 9078181, "Roberto": 9059279, "Diferencia Absoluta": 18902, "Actas JEE": 1275, "Porcentaje Faltante": 2.744, "Observación": ""},
-        {"Día": "16/06", "Keiko": 9123301, "Roberto": 9090392, "Diferencia Absoluta": 32909, "Actas JEE": 897, "Porcentaje Faltante": jee_porc, "Observación": "Corte hasta 08:20:19 a. m."}
+        {"Día": "16/06", "Keiko": 9129316, "Roberto": 9093792, "Diferencia Absoluta": 35524, "Actas JEE": 852, "Porcentaje Faltante": jee_porc, "Observación": "Corte hasta 12:35:25 p. m."}
     ])
 
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 99.033))
-        observadas_jee = int(json_data.get("totales_observadas", 897))
+        procesadas_porc = float(json_data.get("porcentajepros", 99.082))
+        observadas_jee = int(json_data.get("totales_observadas", 852))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
@@ -169,7 +169,7 @@ candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
 
-# CORRECCIÓN DE SINTAXIS ASIGNADA (Solución al fallo de la línea 171)
+# Expresión algebraica limpia y robusta
 diferencia_actual = primero["votos"] - segundo["votos"]
 
 st.sidebar.info(f"Fijación Base: {corte_temporal}")
@@ -184,7 +184,7 @@ def mapear_anotacion(row):
 st.session_state.registro_historico["Etiqueta_Grafico"] = st.session_state.registro_historico.apply(mapear_anotacion, axis=1)
 
 # ==============================================================================
-# 3. CONSTRUCCIÓN DE LA FAJA DE METRICAS PRINCIPAL (ESTILO COMPACTO ONPE)
+# 3. CONSTRUCCIÓN DE LA FAJA DE METRICAS PRINCIPAL (REPLICA PRECISA DE BANNER)
 # ==============================================================================
 st.markdown(
     f"""
@@ -202,7 +202,7 @@ st.markdown(
                     <div style="font-size: 11px; color: #64748B; font-style: italic; margin-top:2px;">
                         {jee_porc:.3f}% de Actas para envío al JEE y {pendiente_porc:.3f}% de Actas pendientes
                     </div>
-                    <!-- Barra de Progreso Estructural Coherente -->
+                    <!-- Barra de Progreso Multi-segmento Estilo ONPE -->
                     <div style="width: 100%; background-color: #E2E8F0; border-radius: 9999px; height: 10px; margin-top: 8px; overflow: hidden; display: flex;">
                         <div style="width: {procesadas_porc}%; background-color: #002C6C; height: 100%;"></div>
                         <div style="width: {jee_porc}%; background-color: #38BDF8; height: 100%;"></div>
@@ -225,7 +225,7 @@ st.markdown(
 )
 
 # ==============================================================================
-# 4. CAPA DE PRESENTACIÓN DE CANDIDATOS (SIMETRÍA BI-LATERAL)
+# 4. CAPA DE PRESENTACIÓN SIMÉTRICA DE CANDIDATOS
 # ==============================================================================
 col_izq, col_der = st.columns(2)
 
@@ -273,7 +273,7 @@ with col_der:
         unsafe_allow_html=True
     )
 
-# Módulo Intermedio de Brecha Absoluta de Control
+# Margen macroeconómico y de ventaja neta
 st.markdown(
     f"""
     <div style="background-color: #F0FDF4; border: 1px solid #BBF7D0; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 25px;">
@@ -287,7 +287,7 @@ st.markdown(
 )
 
 # ==============================================================================
-# 5. MÓDULO GRÁFICO AVANZADO (PROCESAMIENTO DE IDENTIDADES LIMITADAS)
+# 5. MÓDULO GRÁFICO TÉCNICO COMPLEMENTARIO
 # ==============================================================================
 st.markdown("<h3 style='font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #E2E8F0; padding-bottom: 6px;'>📊 Vector de Tendencias y Distribución Macroeconómica</h3>", unsafe_allow_html=True)
 col_g1, col_g2 = st.columns(2)
@@ -343,7 +343,7 @@ with col_g2:
     )
     st.plotly_chart(fig_pie, use_container_width=True)
 
-# Curvas Inferiores de Desembalse y Riesgo Residual
+# Curvas Inferiores Operativas
 col_c1, col_c2 = st.columns(2)
 
 with col_c1:
@@ -380,7 +380,7 @@ with col_c2:
 
 st.markdown("---")
 
-# Footer con Isotipo Institucional Personalizado
+# Footer institucional de cierre
 st.markdown(
     """
     <div style="position: relative; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 15px; margin-bottom: 10px;">
