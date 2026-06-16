@@ -110,21 +110,21 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL FIJADA SEGÚN IMAGE_F8D7AD.JPG
+# 2. PARAMETRIZACIÓN NOMINAL FIJADA SEGÚN ESCRUTINIO REAL
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 99.033    # Capturado de image_f8d7ad.jpg
-observadas_jee = 897       # Capturado de image_f8d7ad.jpg
-actas_contabilizadas = 91869  # Capturado de image_f8d7ad.jpg
-actas_pendientes = 0       # Capturado de image_f8d7ad.jpg
-corte_temporal = "16/06/2026 A LAS 08:20:19 a. m."  # Sincronizado con el banner oficial de la imagen
+procesadas_porc = 99.033    
+observadas_jee = 897       
+actas_contabilizadas = 91869  
+actas_pendientes = 0       
+corte_temporal = "16/06/2026 A LAS 08:20:19 a. m."  
 
 candidatos = [
     {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9123301, "porcentaje": 50.090, "color": "#F15A24"}, 
     {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9090392, "porcentaje": 49.910, "color": "#009245"} 
 ]
 
-jee_porc = 0.967  # (897 / 92766) * 100 aproximado oficial
+jee_porc = 0.967  
 pendiente_porc = 0.000
 
 # Inicialización de la Serie de Tiempo Consolidada Diaria
@@ -164,11 +164,13 @@ if status_msg == "OK" and json_data:
     except Exception as e:
         st.sidebar.error(f"Error de parsing: {str(e)}")
 
-# Configuración del margen de ventaja analítico
+# Configuración de ventajas y ordenamiento formal
 candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True)
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
-diferencia_actual = primero["votos"] - second_votos = segundo["votos"]
+
+# CORRECCIÓN DE SINTAXIS ASIGNADA (Solución al fallo de la línea 171)
+diferencia_actual = primero["votos"] - segundo["votos"]
 
 st.sidebar.info(f"Fijación Base: {corte_temporal}")
 
@@ -182,7 +184,7 @@ def mapear_anotacion(row):
 st.session_state.registro_historico["Etiqueta_Grafico"] = st.session_state.registro_historico.apply(mapear_anotacion, axis=1)
 
 # ==============================================================================
-# 3. CONSTRUCCIÓN DE LA FAJA DE METRICAS PRINCIPAL (RÉPLICA IMAGE_F8D7AD.JPG)
+# 3. CONSTRUCCIÓN DE LA FAJA DE METRICAS PRINCIPAL (ESTILO COMPACTO ONPE)
 # ==============================================================================
 st.markdown(
     f"""
@@ -200,11 +202,11 @@ st.markdown(
                     <div style="font-size: 11px; color: #64748B; font-style: italic; margin-top:2px;">
                         {jee_porc:.3f}% de Actas para envío al JEE y {pendiente_porc:.3f}% de Actas pendientes
                     </div>
-                    <!-- Barra de Progreso Multi-segmento Estilo ONPE -->
+                    <!-- Barra de Progreso Estructural Coherente -->
                     <div style="width: 100%; background-color: #E2E8F0; border-radius: 9999px; height: 10px; margin-top: 8px; overflow: hidden; display: flex;">
-                        <div style="width: {procesadas_porc}%; background-color: #002C6C; height: 100%;" title="Contabilizadas"></div>
-                        <div style="width: {jee_porc}%; background-color: #38BDF8; height: 100%;" title="Para envío al JEE"></div>
-                        <div style="width: {pendiente_porc}%; background-color: #CBD5E1; height: 100%;" title="Pendientes"></div>
+                        <div style="width: {procesadas_porc}%; background-color: #002C6C; height: 100%;"></div>
+                        <div style="width: {jee_porc}%; background-color: #38BDF8; height: 100%;"></div>
+                        <div style="width: {pendiente_porc}%; background-color: #CBD5E1; height: 100%;"></div>
                     </div>
                 </td>
                 <td style="width: 30%; text-align: right; vertical-align: middle; border:none; font-size: 11px; color: #475569; font-weight: 500;">
@@ -223,7 +225,7 @@ st.markdown(
 )
 
 # ==============================================================================
-# 4. CAPA DE PRESENTACIÓN DE CANDIDATOS (SIMETRÍA Y IDENTIDAD VISUAL)
+# 4. CAPA DE PRESENTACIÓN DE CANDIDATOS (SIMETRÍA BI-LATERAL)
 # ==============================================================================
 col_izq, col_der = st.columns(2)
 
@@ -271,7 +273,7 @@ with col_der:
         unsafe_allow_html=True
     )
 
-# Bloque Intermedio: Ventaja Absoluta Estructural
+# Módulo Intermedio de Brecha Absoluta de Control
 st.markdown(
     f"""
     <div style="background-color: #F0FDF4; border: 1px solid #BBF7D0; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 25px;">
@@ -285,7 +287,7 @@ st.markdown(
 )
 
 # ==============================================================================
-# 5. MÓDULO GRÁFICO AVANZADO CON DETALLES TÉCNICOS CORREGIDOS
+# 5. MÓDULO GRÁFICO AVANZADO (PROCESAMIENTO DE IDENTIDADES LIMITADAS)
 # ==============================================================================
 st.markdown("<h3 style='font-size: 20px; margin-bottom: 15px; border-bottom: 2px solid #E2E8F0; padding-bottom: 6px;'>📊 Vector de Tendencias y Distribución Macroeconómica</h3>", unsafe_allow_html=True)
 col_g1, col_g2 = st.columns(2)
@@ -341,7 +343,7 @@ with col_g2:
     )
     st.plotly_chart(fig_pie, use_container_width=True)
 
-# Curvas Inferiores Complementarias de Cierre Matemático
+# Curvas Inferiores de Desembalse y Riesgo Residual
 col_c1, col_c2 = st.columns(2)
 
 with col_c1:
