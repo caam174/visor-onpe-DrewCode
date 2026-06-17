@@ -110,21 +110,21 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL ACTUALIZADA SEGÚN IMAGE_544E60.JPG
+# 2. PARAMETRIZACIÓN NOMINAL FIJADA (DATA VECTOR COHERENTE CON IMAGE_544E60.JPG)
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 99.152      # Actualizado de image_544e60.jpg
-observadas_jee = 787         # Actualizado de image_544e60.jpg
-actas_contabilizadas = 91979  # Actualizado de image_544e60.jpg
+procesadas_porc = 99.152      
+observadas_jee = 787         
+actas_contabilizadas = 91979  
 actas_pendientes = 0       
-corte_temporal = "17/06/2026 A LAS 08:00:26 a. m."  # Sincronizado con el nuevo corte oficial
+corte_temporal = "17/06/2026 A LAS 08:00:26 a. m."  
 
 candidatos = [
-    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9136432, "porcentaje": 50.100, "color": "#F15A24"}, # Actualizado
-    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9100083, "porcentaje": 49.900, "color": "#009245"} # Actualizado
+    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9136432, "porcentaje": 50.100, "color": "#F15A24"}, 
+    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9100083, "porcentaje": 49.900, "color": "#009245"} 
 ]
 
-jee_porc = 0.848  # Actualizado de la faja oficial
+jee_porc = 0.848  
 pendiente_porc = 0.000
 
 # Inicialización y actualización de la Serie de Tiempo Consolidada Diaria
@@ -170,7 +170,6 @@ candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
 
-# Expresión algebraica limpia y robusta
 diferencia_actual = primero["votos"] - segundo["votos"]
 
 st.sidebar.info(f"Fijación Base: {corte_temporal}")
@@ -226,7 +225,7 @@ st.markdown(
 )
 
 # ==============================================================================
-# 4. CAPA DE PRESENTACIÓN SIMÉTRICA DE CANDIDATOS
+# 4. CAPA DE PRESENTACIÓN SIMÉTRICA DE CANDIDATOS (GANADOR / PERDEDOR CORREGIDO)
 # ==============================================================================
 col_izq, col_der = st.columns(2)
 
@@ -238,7 +237,7 @@ with col_izq:
                 <span style="font-size: 11px; font-weight: 800; color: {candidatos[0]['color']}; letter-spacing: 1px; border: 1px solid {candidatos[0]['color']}; padding: 2px 8px; border-radius: 4px;">
                     {candidatos[0]['partido']}
                 </span>
-                <span style="font-size: 12px; font-weight: bold; color: #64748B;">POSICIÓN A</span>
+                <span style="font-size: 12px; font-weight: bold; color: #166534; background-color: #DCFCE7; padding: 2px 10px; border-radius: 9999px;">Ganador</span>
             </div>
             <h2 style="font-size: 24px; margin: 15px 0 5px 0; color: #0F172A;">{candidatos[0]['nombre']}</h2>
             <div style="font-size: 56px; font-weight: 800; color: #002C6C; font-family: 'Arial', sans-serif; line-height: 1;">
@@ -260,7 +259,7 @@ with col_der:
                 <span style="font-size: 11px; font-weight: 800; color: {candidatos[1]['color']}; letter-spacing: 1px; border: 1px solid {candidatos[1]['color']}; padding: 2px 8px; border-radius: 4px;">
                     {candidatos[1]['partido']}
                 </span>
-                <span style="font-size: 12px; font-weight: bold; color: #64748B;">POSICIÓN B</span>
+                <span style="font-size: 12px; font-weight: bold; color: #991B1B; background-color: #FEE2E2; padding: 2px 10px; border-radius: 9999px;">Perdedor</span>
             </div>
             <h2 style="font-size: 24px; margin: 15px 0 5px 0; color: #0F172A;">{candidatos[1]['nombre']}</h2>
             <div style="font-size: 56px; font-weight: 800; color: #002C6C; font-family: 'Arial', sans-serif; line-height: 1;">
