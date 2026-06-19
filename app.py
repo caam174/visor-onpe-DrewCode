@@ -326,7 +326,17 @@ st.markdown("---")
 # 6. COMPONENTE INTERACTIVO ACTUALIZADO: UN PUNTO SEGURO PARA EL DESESTRÉS
 # ==============================================================================
 st.markdown("<h3 style='text-align: center; color: #002C6C; margin-bottom: 2px;'>🕹️ Un punto seguro para el desestrés</h3>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center; font-size: 13px; color: #64748B; margin-top:0px;'>Haz una pausa analítica. Presiona la <b>barra espaciadora</b> o <b>haz clic dentro del cuadro</b> para saltar las vallas.</p>", unsafe_allow_html=True)
+
+# Incorporación de la dedicatoria personalizada solicitada por el usuario
+st.markdown(
+    """
+    <p style='text-align: center; font-size: 14px; color: #475569; margin-top: 6px; font-weight: 500; max-width: 750px; margin-left: auto; margin-right: auto; line-height: 1.5;'>
+        Sé que mirar los resultados oficiales te estresa por lo lento que son, así que ¿por qué no te tomas un minuto, te diviertes con este juego y luego vas por un café? ☕<br>
+        <span style='font-size: 12px; color: #94A3B8; font-weight: bold;'>[ Control: Presiona la barra espaciadora o haz clic dentro del cuadro para saltar las vallas ]</span>
+    </p>
+    """, 
+    unsafe_allow_html=True
+)
 
 juego_html = """
 <!DOCTYPE html>
