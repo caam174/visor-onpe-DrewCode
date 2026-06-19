@@ -323,7 +323,7 @@ with col_c2:
 st.markdown("---")
 
 # ==============================================================================
-# 6. COMPONENTE INTERACTIVO: UN PUNTO SEGURO PARA EL DESESTRÉS (CAT RUNNER GAME)
+# 6. COMPONENTE INTERACTIVO ACTUALIZADO: UN PUNTO SEGURO PARA EL DESESTRÉS
 # ==============================================================================
 st.markdown("<h3 style='text-align: center; color: #002C6C; margin-bottom: 2px;'>🕹️ Un punto seguro para el desestrés</h3>", unsafe_allow_html=True)
 st.markdown("<p style='text-align: center; font-size: 13px; color: #64748B; margin-top:0px;'>Haz una pausa analítica. Presiona la <b>barra espaciadora</b> o <b>haz clic dentro del cuadro</b> para saltar las vallas.</p>", unsafe_allow_html=True)
@@ -337,7 +337,7 @@ juego_html = """
         #canvasContainer { position: relative; width: 600px; height: 160px; }
         canvas { border: 1px solid #CBD5E1; background-color: #F8FAFC; border-radius: 8px; display: block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
         #scoreBoard { position: absolute; top: 10px; right: 15px; font-size: 12px; color: #475569; font-weight: bold; line-height: 1.5; text-align: right; pointer-events: none; }
-        #gameOverOverlay { position: absolute; top: 0; left: 0; width: 600px; height: 160px; background: rgba(248, 250, 252, 0.85); display: none; flex-direction: column; justify-content: center; align-items: center; border-radius: 8px; border: 1px solid #CBD5E1; }
+        #gameOverOverlay { position: absolute; top: 0; left: 0; width: 600px; height: 160px; background: rgba(248, 250, 252, 0.85); display: none; flex-direction: column; justify-content: center; align-items: center; border-radius: 8px; border: 1px solid #CBD5E1; cursor: pointer; }
         #gameOverOverlay h4 { color: #991B1B; margin: 0 0 5px 0; font-size: 16px; }
         #gameOverOverlay p { color: #475569; margin: 0; font-size: 12px; font-weight: bold; }
     </style>
@@ -407,7 +407,7 @@ juego_html = """
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 obstacles[i].x -= obstacles[i].speed;
 
-                // Detección de colisiones por hitboxes adaptadas
+                // Detección de colisiones
                 if (obstacles[i].x < cat.x + cat.wy - 4 && obstacles[i].x + obstacles[i].width > cat.x + 4) {
                     if (cat.y + cat.hy - 2 > obstacles[i].y) {
                         endGame();
@@ -436,13 +436,34 @@ juego_html = """
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawFloor();
 
-            // Renderizado del gato
+            // RENDERIZADO DEL GATO CON GIRO HORIZONTAL (Mira de frente a las vallas)
+            ctx.save();
+            ctx.translate(cat.x + 13, cat.y + 13); // Trasladar al centro relativo del sprite
+            ctx.scale(-1, 1);                       // Voltear horizontalmente el contexto de dibujo
             ctx.font = '26px Arial';
-            ctx.textBaseline = 'top';
-            ctx.fillText(cat.emoji, cat.x, cat.y);
+            ctx.textBaseline = 'middle';
+            ctx.textAlign = 'center';
+            
+            // Si el juego corre usa el gato común, si pierde cambia a cara de gato triste/derrotado
+            let currentEmoji = gameRunning ? cat.emoji : '😿';
+            ctx.fillText(currentEmoji, 0, 0);
+            ctx.restore();
 
-            // Renderizado de las vallas
+            // BOCADILLO DIVERTIDO DE "¡PERDÍ!" DIRECTAMENTE SOBRE ÉL AL CHOCAR
+            if (!gameRunning) {
+                ctx.save();
+                ctx.font = 'bold 12px Arial';
+                ctx.fillStyle = '#DC2626';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'bottom';
+                ctx.fillText('¡Perdí! 😾', cat.x + 13, cat.y - 6);
+                ctx.restore();
+            }
+
+            // Renderizado de las vallas de contención
             ctx.font = '22px Arial';
+            ctx.textBaseline = 'top';
+            ctx.textAlign = 'left';
             for (let obs of obstacles) {
                 ctx.fillText(obs.emoji, obs.x, obs.y);
             }
@@ -482,7 +503,7 @@ juego_html = """
             gameRunning = true;
         }
 
-        // Manejo de controles limpios sin interferir con la ventana principal
+        // Eventos de control seguros
         window.addEventListener('keydown', function(e) {
             if (e.code === 'Space') {
                 e.preventDefault();
@@ -505,7 +526,7 @@ components.html(juego_html, height=175)
 
 st.markdown("---")
 
-# Footer institucional de cierre
+# Footer de cierre estructurado
 st.markdown(
     """
     <div style="position: relative; width: 100%; display: flex; justify-content: center; align-items: center; margin-top: 15px; margin-bottom: 10px;">
