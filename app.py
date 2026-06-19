@@ -4,6 +4,7 @@ import plotly.express as px
 import requests
 import datetime
 import time
+import streamlit.components.v1 as components
 
 # ==============================================================================
 # 1. INFRAESTRUCTURA VISUAL E INYECCIÓN DE ESTILO INSTITUCIONAL (CMU SERIF)
@@ -47,13 +48,6 @@ st.markdown(
             border-radius: 6px;
             padding: 18px 24px;
             margin-bottom: 25px;
-        }
-        
-        .card-metrica-mini {
-            background-color: #F1F5F9;
-            border-left: 4px solid #002C6C;
-            padding: 15px;
-            border-radius: 0px 6px 6px 0px;
         }
     </style>
     """,
@@ -110,21 +104,21 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL FIJADA (DATA VECTOR COHERENTE CON IMAGE_9D36CE.JPG)
+# 2. PARAMETRIZACIÓN NOMINAL FIJADA (DATA VECTOR COHERENTE CON IMAGE_3BE47B.JPG)
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 99.391      
-observadas_jee = 565         
-actas_contabilizadas = 92201  
+procesadas_porc = 99.506      
+observadas_jee = 458         
+actas_contabilizadas = 92308  
 actas_pendientes = 0       
-corte_temporal = "18/06/2026 A LAS 01:10:18 p. m."  
+corte_temporal = "19/06/2026 A LAS 07:50:19 a. m."  
 
 candidatos = [
-    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9158662, "porcentaje": 50.108, "color": "#F15A24"}, 
-    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9119096, "porcentaje": 49.892, "color": "#009245"} 
+    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9172509, "porcentaje": 50.120, "color": "#F15A24"}, 
+    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9128408, "porcentaje": 49.880, "color": "#009245"} 
 ]
 
-jee_porc = 0.609  
+jee_porc = 0.494  
 pendiente_porc = 0.000
 
 # Inicialización y actualización de la Serie de Tiempo Consolidada Diaria
@@ -136,13 +130,14 @@ if "registro_historico" not in st.session_state:
         {"Día": "15/06", "Keiko": 9078181, "Roberto": 9059279, "Diferencia Absoluta": 18902, "Actas JEE": 1275, "Porcentaje Faltante": 2.744, "Observación": ""},
         {"Día": "16/06", "Keiko": 9129316, "Roberto": 9093792, "Diferencia Absoluta": 35524, "Actas JEE": 852, "Porcentaje Faltante": 0.918, "Observación": ""},
         {"Día": "17/06", "Keiko": 9136432, "Roberto": 9100083, "Diferencia Absoluta": 36349, "Actas JEE": 787, "Porcentaje Faltante": 0.848, "Observación": ""},
-        {"Día": "18/06", "Keiko": 9158662, "Roberto": 9119096, "Diferencia Absoluta": 39566, "Actas JEE": 565, "Porcentaje Faltante": jee_porc, "Observación": "Corte hasta 01:10:18 p. m."}
+        {"Día": "18/06", "Keiko": 9158662, "Roberto": 9119096, "Diferencia Absoluta": 39566, "Actas JEE": 565, "Porcentaje Faltante": 0.609, "Observación": ""},
+        {"Día": "19/06", "Keiko": 9172509, "Roberto": 9128408, "Diferencia Absoluta": 44101, "Actas JEE": 458, "Porcentaje Faltante": jee_porc, "Observación": "Corte 07:50:19 a. m."}
     ])
 
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 99.391))
-        observadas_jee = int(json_data.get("totales_observadas", 565))
+        procesadas_porc = float(json_data.get("porcentajepros", 99.506))
+        observadas_jee = int(json_data.get("totales_observadas", 458))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
@@ -156,26 +151,23 @@ if status_msg == "OK" and json_data:
             jee_porc = (observadas_jee / total_actas) * 100
             
             df_actual = st.session_state.registro_historico
-            df_actual.loc[df_actual["Día"] == "18/06", "Keiko"] = votos_k
-            df_actual.loc[df_actual["Día"] == "18/06", "Roberto"] = votos_r
-            df_actual.loc[df_actual["Día"] == "18/06", "Diferencia Absoluta"] = abs(votos_k - votos_r)
-            df_actual.loc[df_actual["Día"] == "18/06", "Actas JEE"] = observadas_jee
-            df_actual.loc[df_actual["Día"] == "18/06", "Porcentaje Faltante"] = round(jee_porc, 3)
-            df_actual.loc[df_actual["Día"] == "18/06", "Observación"] = f"Corte Dinámico: {datetime.datetime.now().strftime('%H:%M:%S')}"
+            df_actual.loc[df_actual["Día"] == "19/06", "Keiko"] = votos_k
+            df_actual.loc[df_actual["Día"] == "19/06", "Roberto"] = votos_r
+            df_actual.loc[df_actual["Día"] == "19/06", "Diferencia Absoluta"] = abs(votos_k - votos_r)
+            df_actual.loc[df_actual["Día"] == "19/06", "Actas JEE"] = observadas_jee
+            df_actual.loc[df_actual["Día"] == "19/06", "Porcentaje Faltante"] = round(jee_porc, 3)
+            df_actual.loc[df_actual["Día"] == "19/06", "Observación"] = f"Corte Dinámico: {datetime.datetime.now().strftime('%H:%M:%S')}"
             st.session_state.registro_historico = df_actual
     except Exception as e:
         st.sidebar.error(f"Error de parsing: {str(e)}")
 
-# Configuración de ventajas y ordenamiento formal
 candidatos_ordenados = sorted(candidatos, key=lambda x: x["votos"], reverse=True)
 primero = candidatos_ordenados[0]
 segundo = candidatos_ordenados[1]
-
 diferencia_actual = primero["votos"] - segundo["votos"]
 
 st.sidebar.info(f"Fijación Base: {corte_temporal}")
 
-# Mapeo de anotaciones sobre los vectores gráficos
 def mapear_anotacion(row):
     base = f"{row['Diferencia Absoluta']:,}"
     if row["Observación"]:
@@ -185,7 +177,7 @@ def mapear_anotacion(row):
 st.session_state.registro_historico["Etiqueta_Grafico"] = st.session_state.registro_historico.apply(mapear_anotacion, axis=1)
 
 # ==============================================================================
-# 3. CONSTRUCCIÓN DE LA FAJA DE METRICAS PRINCIPAL (REPLICA PRECISA DE BANNER)
+# 3. CONSTRUCCIÓN DE LA FAJA DE METRICAS PRINCIPAL (REPLICA REVISADA DE BANNER)
 # ==============================================================================
 st.markdown(
     f"""
@@ -203,7 +195,6 @@ st.markdown(
                     <div style="font-size: 11px; color: #64748B; font-style: italic; margin-top:2px;">
                         {jee_porc:.3f}% de Actas para envío al JEE y {pendiente_porc:.3f}% de Actas pendientes
                     </div>
-                    <!-- Barra de Progreso Multi-segmento Estilo ONPE -->
                     <div style="width: 100%; background-color: #E2E8F0; border-radius: 9999px; height: 10px; margin-top: 8px; overflow: hidden; display: flex;">
                         <div style="width: {procesadas_porc}%; background-color: #002C6C; height: 100%;"></div>
                         <div style="width: {jee_porc}%; background-color: #38BDF8; height: 100%;"></div>
@@ -226,7 +217,7 @@ st.markdown(
 )
 
 # ==============================================================================
-# 4. CAPA DE PRESENTACIÓN SIMÉTRICA DE CANDIDATOS (GANADOR / PERDEDOR FIJADO)
+# 4. CAPA DE PRESENTACIÓN SIMÉTRICA DE CANDIDATOS
 # ==============================================================================
 col_izq, col_der = st.columns(2)
 
@@ -274,7 +265,6 @@ with col_der:
         unsafe_allow_html=True
     )
 
-# Margen macroeconómico y de ventaja neta
 st.markdown(
     f"""
     <div style="background-color: #F0FDF4; border: 1px solid #BBF7D0; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 25px;">
@@ -301,83 +291,217 @@ plotly_layout_defaults = dict(
 
 with col_g1:
     st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📈 Evolución Histórica de la Diferencia Absoluta (Dato por Día Acumulado)</p>", unsafe_allow_html=True)
-    
-    fig_linea_diff = px.line(
-        st.session_state.registro_historico, x="Día", y="Diferencia Absoluta",
-        markers=True, text="Etiqueta_Grafico"
-    )
-    fig_linea_diff.update_traces(
-        line_color="#002C6C", 
-        line_width=4, 
-        textposition="top center",
-        marker=dict(size=10, line=dict(width=2, color='white'), color="#F15A24")
-    )  
-    fig_linea_diff.update_layout(
-        **plotly_layout_defaults,
-        margin=dict(t=35, b=15, l=15, r=15), 
-        height=340, 
-        xaxis=dict(type='category', gridcolor='#F1F5F9', title="Jornada Electoral (Consolidado Diario)"),
-        yaxis=dict(gridcolor='#F1F5F9', title="Brecha de Votos")
-    )
+    fig_linea_diff = px.line(st.session_state.registro_historico, x="Día", y="Diferencia Absoluta", markers=True, text="Etiqueta_Grafico")
+    fig_linea_diff.update_traces(line_color="#002C6C", line_width=4, textposition="top center", marker=dict(size=10, line=dict(width=2, color='white'), color="#F15A24"))  
+    fig_linea_diff.update_layout(**plotly_layout_defaults, margin=dict(t=35, b=15, l=15, r=15), height=340, xaxis=dict(type='category', gridcolor='#F1F5F9'), yaxis=dict(gridcolor='#F1F5F9'))
     st.plotly_chart(fig_linea_diff, use_container_width=True)
 
 with col_g2:
     st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📉 Composición Porcentual del Espectro Válido</p>", unsafe_allow_html=True)
-    df_pie = pd.DataFrame({
-        "Candidato": [candidatos[0]["nombre"], candidatos[1]["nombre"]], 
-        "Votos": [candidatos[0]["votos"], candidatos[1]["votos"]]
-    })
-    fig_pie = px.pie(
-        df_pie, values="Votos", names="Candidato", hole=0.5,
-        color_discrete_sequence=[candidatos[0]["color"], candidatos[1]["color"]]  
-    )
-    fig_pie.update_traces(
-        texttemplate="<b>%{percent:.3%}</b><br>%{value:,} votos", 
-        textfont_size=12,
-        marker=dict(line=dict(color='#FFFFFF', width=2))
-    )
-    fig_pie.update_layout(
-        **plotly_layout_defaults,
-        showlegend=False, 
-        margin=dict(t=15, b=15, l=15, r=15), 
-        height=340
-    )
+    df_pie = pd.DataFrame({"Candidato": [candidatos[0]["nombre"], candidatos[1]["nombre"]], "Votos": [candidatos[0]["votos"], candidatos[1]["votos"]]})
+    fig_pie = px.pie(df_pie, values="Votos", names="Candidato", hole=0.5, color_discrete_sequence=[candidatos[0]["color"], candidatos[1]["color"]])
+    fig_pie.update_traces(texttemplate="<b>%{percent:.3%}</b><br>%{value:,} votos", textfont_size=12, marker=dict(line=dict(color='#FFFFFF', width=2)))
+    fig_pie.update_layout(**plotly_layout_defaults, showlegend=False, margin=dict(t=15, b=15, l=15, r=15), height=340)
     st.plotly_chart(fig_pie, use_container_width=True)
 
-# Curvas Inferiores Operativas
 col_c1, col_c2 = st.columns(2)
 
 with col_c1:
     st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📂 Desembalse Operativo: Curva de Actas en el JEE por Jornada</p>", unsafe_allow_html=True)
-    fig_jee = px.line(
-        st.session_state.registro_historico, x="Día", y="Actas JEE",
-        markers=True, text="Actas JEE"
-    )
+    fig_jee = px.line(st.session_state.registro_historico, x="Día", y="Actas JEE", markers=True, text="Actas JEE")
     fig_jee.update_traces(line_color="#38BDF8", line_width=3, textposition="top center", marker=dict(size=8, color="#002C6C"))
-    fig_jee.update_layout(
-        **plotly_layout_defaults,
-        margin=dict(t=25, b=15, l=15, r=15), 
-        height=280, 
-        xaxis=dict(type='category', gridcolor='#F1F5F9'),
-        yaxis=dict(gridcolor='#F1F5F9')
-    )
+    fig_jee.update_layout(**plotly_layout_defaults, margin=dict(t=25, b=15, l=15, r=15), height=280, xaxis=dict(type='category', gridcolor='#F1F5F9'), yaxis=dict(gridcolor='#F1F5F9'))
     st.plotly_chart(fig_jee, use_container_width=True)
 
 with col_c2:
     st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📉 Umbral Regulatorio: % Pendiente de Resolución Total</p>", unsafe_allow_html=True)
-    fig_faltante = px.area(
-        st.session_state.registro_historico, x="Día", y="Porcentaje Faltante",
-        markers=True, text="Porcentaje Faltante"
-    )
+    fig_faltante = px.area(st.session_state.registro_historico, x="Día", y="Porcentaje Faltante", markers=True, text="Porcentaje Faltante")
     fig_faltante.update_traces(line_color="#64748B", texttemplate="<b>%{text:.3f}%</b>", textposition="top center", marker=dict(size=8, color="#002C6C"))
-    fig_faltante.update_layout(
-        **plotly_layout_defaults,
-        margin=dict(t=25, b=15, l=15, r=15), 
-        height=280, 
-        xaxis=dict(type='category', gridcolor='#F1F5F9'),
-        yaxis=dict(gridcolor='#F1F5F9')
-    )
+    fig_faltante.update_layout(**plotly_layout_defaults, margin=dict(t=25, b=15, l=15, r=15), height=280, xaxis=dict(type='category', gridcolor='#F1F5F9'), yaxis=dict(gridcolor='#F1F5F9'))
     st.plotly_chart(fig_faltante, use_container_width=True)
+
+st.markdown("---")
+
+# ==============================================================================
+# 6. COMPONENTE INTERACTIVO: UN PUNTO SEGURO PARA EL DESESTRÉS (CAT RUNNER GAME)
+# ==============================================================================
+st.markdown("<h3 style='text-align: center; color: #002C6C; margin-bottom: 2px;'>🕹️ Un punto seguro para el desestrés</h3>", unsafe_allow_html=True)
+st.markdown("<p style='text-align: center; font-size: 13px; color: #64748B; margin-top:0px;'>Haz una pausa analítica. Presiona la <b>barra espaciadora</b> o <b>haz clic dentro del cuadro</b> para saltar las vallas.</p>", unsafe_allow_html=True)
+
+juego_html = """
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; background-color: transparent; font-family: 'Arial', sans-serif; }
+        #canvasContainer { position: relative; width: 600px; height: 160px; }
+        canvas { border: 1px solid #CBD5E1; background-color: #F8FAFC; border-radius: 8px; display: block; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
+        #scoreBoard { position: absolute; top: 10px; right: 15px; font-size: 12px; color: #475569; font-weight: bold; line-height: 1.5; text-align: right; pointer-events: none; }
+        #gameOverOverlay { position: absolute; top: 0; left: 0; width: 600px; height: 160px; background: rgba(248, 250, 252, 0.85); display: none; flex-direction: column; justify-content: center; align-items: center; border-radius: 8px; border: 1px solid #CBD5E1; }
+        #gameOverOverlay h4 { color: #991B1B; margin: 0 0 5px 0; font-size: 16px; }
+        #gameOverOverlay p { color: #475569; margin: 0; font-size: 12px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div id="canvasContainer">
+        <canvas id="runnerCanvas" width="600" height="150"></canvas>
+        <div id="scoreBoard">PUNTOS: <span id="currentScore">0</span><br>MÁXIMO: <span id="highScore">0</span></div>
+        <div id="gameOverOverlay" onclick="resetGame()">
+            <h4>¡Valla impactada!</h4>
+            <p>Haz clic o presiona Espacio para reiniciar</p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('runnerCanvas');
+        const ctx = canvas.getContext('2d');
+        const overlay = document.getElementById('gameOverOverlay');
+        
+        let score = 0;
+        let highScore = localStorage.getItem('catRunnerHighScore') || 0;
+        document.getElementById('highScore').innerText = highScore;
+
+        let gameRunning = true;
+        let gravity = 0.6;
+        
+        let cat = { x: 50, y: 115, wy: 26, hy: 26, vy: 0, jumping: false, emoji: '🐈' };
+        let obstacles = [];
+        let frame = 0;
+        let nextObstacleFrame = 100;
+
+        function spawnObstacle() {
+            obstacles.push({ x: 620, y: 118, width: 20, height: 22, emoji: '🚧', speed: 5 + Math.floor(score / 15) });
+        }
+
+        function drawFloor() {
+            ctx.beginPath();
+            ctx.moveTo(0, 138);
+            ctx.lineTo(600, 138);
+            ctx.strokeStyle = '#CBD5E1';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        function update() {
+            if (!gameRunning) return;
+            frame++;
+
+            // Movimiento/Gravedad del gato
+            if (cat.jumping) {
+                cat.vy += gravity;
+                cat.y += cat.vy;
+                if (cat.y >= 115) {
+                    cat.y = 115;
+                    cat.vy = 0;
+                    cat.jumping = false;
+                }
+            }
+
+            // Gestión de vallas
+            if (frame >= nextObstacleFrame) {
+                spawnObstacle();
+                frame = 0;
+                nextObstacleFrame = Math.max(45, 90 - Math.floor(score * 1.5) + Math.floor(Math.random() * 40));
+            }
+
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= obstacles[i].speed;
+
+                // Detección de colisiones por hitboxes adaptadas
+                if (obstacles[i].x < cat.x + cat.wy - 4 && obstacles[i].x + obstacles[i].width > cat.x + 4) {
+                    if (cat.y + cat.hy - 2 > obstacles[i].y) {
+                        endGame();
+                    }
+                }
+
+                // Sumar puntuación al superar la valla
+                if (obstacles[i].x + obstacles[i].width < cat.x && !obstacles[i].passed) {
+                    obstacles[i].passed = true;
+                    score++;
+                    document.getElementById('currentScore').innerText = score;
+                    if (score > highScore) {
+                        highScore = score;
+                        document.getElementById('highScore').innerText = highScore;
+                        localStorage.setItem('catRunnerHighScore', highScore);
+                    }
+                }
+
+                if (obstacles[i].x < -30) {
+                    obstacles.splice(i, 1);
+                }
+            }
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawFloor();
+
+            // Renderizado del gato
+            ctx.font = '26px Arial';
+            ctx.textBaseline = 'top';
+            ctx.fillText(cat.emoji, cat.x, cat.y);
+
+            // Renderizado de las vallas
+            ctx.font = '22px Arial';
+            for (let obs of obstacles) {
+                ctx.fillText(obs.emoji, obs.x, obs.y);
+            }
+        }
+
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        function jump() {
+            if (!cat.jumping && gameRunning) {
+                cat.vy = -9.5;
+                cat.jumping = true;
+            }
+            if (!gameRunning) {
+                resetGame();
+            }
+        }
+
+        function endGame() {
+            gameRunning = false;
+            overlay.style.display = 'flex';
+        }
+
+        function resetGame() {
+            score = 0;
+            document.getElementById('currentScore').innerText = '0';
+            obstacles = [];
+            cat.y = 115;
+            cat.vy = 0;
+            cat.jumping = false;
+            frame = 0;
+            nextObstacleFrame = 100;
+            overlay.style.display = 'none';
+            gameRunning = true;
+        }
+
+        // Manejo de controles limpios sin interferir con la ventana principal
+        window.addEventListener('keydown', function(e) {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                jump();
+            }
+        });
+
+        canvas.addEventListener('click', function(e) {
+            e.preventDefault();
+            jump();
+        });
+
+        loop();
+    </script>
+</body>
+</html>
+"""
+
+components.html(juego_html, height=175)
 
 st.markdown("---")
 
