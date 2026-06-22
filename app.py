@@ -104,21 +104,21 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL FIJADA (DATA VECTOR COHERENTE CON IMAGE_3BE47B.JPG)
+# 2. PARAMETRIZACIÓN NOMINAL FIJADA (DATA VECTOR COHERENTE CON IMAGE_80E2A1.JPG)
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 99.506      
-observadas_jee = 458         
-actas_contabilizadas = 92308  
+procesadas_porc = 99.691      
+observadas_jee = 287         
+actas_contabilizadas = 92479  
 actas_pendientes = 0       
-corte_temporal = "19/06/2026 A LAS 07:50:19 a. m."  
+corte_temporal = "22/06/2026 A LAS 08:25:25 a. m."  
 
 candidatos = [
-    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9172509, "porcentaje": 50.120, "color": "#F15A24"}, 
-    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9128408, "porcentaje": 49.880, "color": "#009245"} 
+    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9188704, "porcentaje": 50.111, "color": "#F15A24"}, 
+    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9147886, "porcentaje": 49.889, "color": "#009245"} 
 ]
 
-jee_porc = 0.494  
+jee_porc = 0.309  
 pendiente_porc = 0.000
 
 # Inicialización y actualización de la Serie de Tiempo Consolidada Diaria
@@ -131,13 +131,14 @@ if "registro_historico" not in st.session_state:
         {"Día": "16/06", "Keiko": 9129316, "Roberto": 9093792, "Diferencia Absoluta": 35524, "Actas JEE": 852, "Porcentaje Faltante": 0.918, "Observación": ""},
         {"Día": "17/06", "Keiko": 9136432, "Roberto": 9100083, "Diferencia Absoluta": 36349, "Actas JEE": 787, "Porcentaje Faltante": 0.848, "Observación": ""},
         {"Día": "18/06", "Keiko": 9158662, "Roberto": 9119096, "Diferencia Absoluta": 39566, "Actas JEE": 565, "Porcentaje Faltante": 0.609, "Observación": ""},
-        {"Día": "19/06", "Keiko": 9172509, "Roberto": 9128408, "Diferencia Absoluta": 44101, "Actas JEE": 458, "Porcentaje Faltante": jee_porc, "Observación": "Corte 07:50:19 a. m."}
+        {"Día": "19/06", "Keiko": 9172509, "Roberto": 9128408, "Diferencia Absoluta": 44101, "Actas JEE": 458, "Porcentaje Faltante": 0.494, "Observación": ""},
+        {"Día": "22/06", "Keiko": 9188704, "Roberto": 9147886, "Diferencia Absoluta": 40818, "Actas JEE": 287, "Porcentaje Faltante": jee_porc, "Observación": "Corte 08:25:25 a. m."}
     ])
 
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 99.506))
-        observadas_jee = int(json_data.get("totales_observadas", 458))
+        procesadas_porc = float(json_data.get("porcentajepros", 99.691))
+        observadas_jee = int(json_data.get("totales_observadas", 287))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
@@ -151,12 +152,12 @@ if status_msg == "OK" and json_data:
             jee_porc = (observadas_jee / total_actas) * 100
             
             df_actual = st.session_state.registro_historico
-            df_actual.loc[df_actual["Día"] == "19/06", "Keiko"] = votos_k
-            df_actual.loc[df_actual["Día"] == "19/06", "Roberto"] = votos_r
-            df_actual.loc[df_actual["Día"] == "19/06", "Diferencia Absoluta"] = abs(votos_k - votos_r)
-            df_actual.loc[df_actual["Día"] == "19/06", "Actas JEE"] = observadas_jee
-            df_actual.loc[df_actual["Día"] == "19/06", "Porcentaje Faltante"] = round(jee_porc, 3)
-            df_actual.loc[df_actual["Día"] == "19/06", "Observación"] = f"Corte Dinámico: {datetime.datetime.now().strftime('%H:%M:%S')}"
+            df_actual.loc[df_actual["Día"] == "22/06", "Keiko"] = votos_k
+            df_actual.loc[df_actual["Día"] == "22/06", "Roberto"] = votos_r
+            df_actual.loc[df_actual["Día"] == "22/06", "Diferencia Absoluta"] = abs(votos_k - votos_r)
+            df_actual.loc[df_actual["Día"] == "22/06", "Actas JEE"] = observadas_jee
+            df_actual.loc[df_actual["Día"] == "22/06", "Porcentaje Faltante"] = round(jee_porc, 3)
+            df_actual.loc[df_actual["Día"] == "22/06", "Observación"] = f"Corte Dinámico: {datetime.datetime.now().strftime('%H:%M:%S')}"
             st.session_state.registro_historico = df_actual
     except Exception as e:
         st.sidebar.error(f"Error de parsing: {str(e)}")
@@ -327,7 +328,6 @@ st.markdown("---")
 # ==============================================================================
 st.markdown("<h3 style='text-align: center; color: #002C6C; margin-bottom: 2px;'>🕹️ Un punto seguro para el desestrés</h3>", unsafe_allow_html=True)
 
-# Incorporación de la dedicatoria personalizada solicitada por el usuario
 st.markdown(
     """
     <p style='text-align: center; font-size: 14px; color: #475569; margin-top: 6px; font-weight: 500; max-width: 750px; margin-left: auto; margin-right: auto; line-height: 1.5;'>
@@ -396,7 +396,6 @@ juego_html = """
             if (!gameRunning) return;
             frame++;
 
-            // Movimiento/Gravedad del gato
             if (cat.jumping) {
                 cat.vy += gravity;
                 cat.y += cat.vy;
@@ -407,7 +406,6 @@ juego_html = """
                 }
             }
 
-            // Gestión de vallas
             if (frame >= nextObstacleFrame) {
                 spawnObstacle();
                 frame = 0;
@@ -417,14 +415,12 @@ juego_html = """
             for (let i = obstacles.length - 1; i >= 0; i--) {
                 obstacles[i].x -= obstacles[i].speed;
 
-                // Detección de colisiones
                 if (obstacles[i].x < cat.x + cat.wy - 4 && obstacles[i].x + obstacles[i].width > cat.x + 4) {
                     if (cat.y + cat.hy - 2 > obstacles[i].y) {
                         endGame();
                     }
                 }
 
-                // Sumar puntuación al superar la valla
                 if (obstacles[i].x + obstacles[i].width < cat.x && !obstacles[i].passed) {
                     obstacles[i].passed = true;
                     score++;
@@ -446,20 +442,17 @@ juego_html = """
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawFloor();
 
-            // RENDERIZADO DEL GATO CON GIRO HORIZONTAL (Mira de frente a las vallas)
             ctx.save();
-            ctx.translate(cat.x + 13, cat.y + 13); // Trasladar al centro relativo del sprite
-            ctx.scale(-1, 1);                       // Voltear horizontalmente el contexto de dibujo
+            ctx.translate(cat.x + 13, cat.y + 13);
+            ctx.scale(-1, 1);
             ctx.font = '26px Arial';
             ctx.textBaseline = 'middle';
             ctx.textAlign = 'center';
             
-            // Si el juego corre usa el gato común, si pierde cambia a cara de gato triste/derrotado
             let currentEmoji = gameRunning ? cat.emoji : '😿';
             ctx.fillText(currentEmoji, 0, 0);
             ctx.restore();
 
-            // BOCADILLO DIVERTIDO DE "¡PERDÍ!" DIRECTAMENTE SOBRE ÉL AL CHOCAR
             if (!gameRunning) {
                 ctx.save();
                 ctx.font = 'bold 12px Arial';
@@ -470,7 +463,6 @@ juego_html = """
                 ctx.restore();
             }
 
-            // Renderizado de las vallas de contención
             ctx.font = '22px Arial';
             ctx.textBaseline = 'top';
             ctx.textAlign = 'left';
@@ -513,7 +505,6 @@ juego_html = """
             gameRunning = true;
         }
 
-        // Eventos de control seguros
         window.addEventListener('keydown', function(e) {
             if (e.code === 'Space') {
                 e.preventDefault();
