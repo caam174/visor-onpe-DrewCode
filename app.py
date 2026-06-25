@@ -104,21 +104,21 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL FIJADA (DATA VECTOR COHERENTE CON IMAGE_C067FD.JPG)
+# 2. PARAMETRIZACIÓN NOMINAL FIJADA (DATA VECTOR COHERENTE CON IMAGE_3DC826.JPG)
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 99.859      
-observadas_jee = 131         
-actas_contabilizadas = 92635  
+procesadas_porc = 99.877      
+observadas_jee = 114         
+actas_contabilizadas = 92652  
 actas_pendientes = 0       
-corte_temporal = "24/06/2026 A LAS 07:50:25 a. m."  
+corte_temporal = "25/06/2026 A LAS 07:50:25 a. m."  
 
 candidatos = [
-    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9206241, "porcentaje": 50.118, "color": "#F15A24"}, 
-    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9162855, "porcentaje": 49.882, "color": "#009245"} 
+    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9208624, "porcentaje": 50.121, "color": "#F15A24"}, 
+    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9164171, "porcentaje": 49.879, "color": "#009245"} 
 ]
 
-jee_porc = 0.141  
+jee_porc = 0.123  
 pendiente_porc = 0.000
 
 # Inicialización y actualización de la Serie de Tiempo Consolidada Diaria
@@ -134,13 +134,14 @@ if "registro_historico" not in st.session_state:
         {"Día": "19/06", "Keiko": 9172509, "Roberto": 9128408, "Diferencia Absoluta": 44101, "Actas JEE": 458, "Porcentaje Faltante": 0.494, "Observación": ""},
         {"Día": "22/06", "Keiko": 9188704, "Roberto": 9147886, "Diferencia Absoluta": 40818, "Actas JEE": 287, "Porcentaje Faltante": 0.309, "Observación": ""},
         {"Día": "23/06", "Keiko": 9190889, "Roberto": 9150289, "Diferencia Absoluta": 40600, "Actas JEE": 263, "Porcentaje Faltante": 0.284, "Observación": ""},
-        {"Día": "24/06", "Keiko": 9206241, "Roberto": 9162855, "Diferencia Absoluta": 43386, "Actas JEE": 131, "Porcentaje Faltante": jee_porc, "Observación": "Corte 07:50:25 a. m."}
+        {"Día": "24/06", "Keiko": 9206241, "Roberto": 9162855, "Diferencia Absoluta": 43386, "Actas JEE": 131, "Porcentaje Faltante": 0.141, "Observación": ""},
+        {"Día": "25/06", "Keiko": 9208624, "Roberto": 9164171, "Diferencia Absoluta": 44453, "Actas JEE": 114, "Porcentaje Faltante": jee_porc, "Observación": "Corte 07:50:25 a. m."}
     ])
 
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 99.859))
-        observadas_jee = int(json_data.get("totales_observadas", 131))
+        procesadas_porc = float(json_data.get("porcentajepros", 99.877))
+        observadas_jee = int(json_data.get("totales_observadas", 114))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
@@ -154,12 +155,12 @@ if status_msg == "OK" and json_data:
             jee_porc = (observadas_jee / total_actas) * 100
             
             df_actual = st.session_state.registro_historico
-            df_actual.loc[df_actual["Día"] == "24/06", "Keiko"] = votos_k
-            df_actual.loc[df_actual["Día"] == "24/06", "Roberto"] = votos_r
-            df_actual.loc[df_actual["Día"] == "24/06", "Diferencia Absoluta"] = abs(votos_k - votos_r)
-            df_actual.loc[df_actual["Día"] == "24/06", "Actas JEE"] = observadas_jee
-            df_actual.loc[df_actual["Día"] == "24/06", "Porcentaje Faltante"] = round(jee_porc, 3)
-            df_actual.loc[df_actual["Día"] == "24/06", "Observación"] = f"Corte Dinámico: {datetime.datetime.now().strftime('%H:%M:%S')}"
+            df_actual.loc[df_actual["Día"] == "25/06", "Keiko"] = votos_k
+            df_actual.loc[df_actual["Día"] == "25/06", "Roberto"] = votos_r
+            df_actual.loc[df_actual["Día"] == "25/06", "Diferencia Absoluta"] = abs(votos_k - votos_r)
+            df_actual.loc[df_actual["Día"] == "25/06", "Actas JEE"] = observadas_jee
+            df_actual.loc[df_actual["Día"] == "25/06", "Porcentaje Faltante"] = round(jee_porc, 3)
+            df_actual.loc[df_actual["Día"] == "25/06", "Observación"] = f"Corte Dinámico: {datetime.datetime.now().strftime('%H:%M:%S')}"
             st.session_state.registro_historico = df_actual
     except Exception as e:
         st.sidebar.error(f"Error de parsing: {str(e)}")
