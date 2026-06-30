@@ -9,7 +9,7 @@ import streamlit.components.v1 as components
 # ==============================================================================
 # 1. INFRAESTRUCTURA VISUAL E INYECCIÓN DE ESTILO INSTITUCIONAL (CMU SERIF)
 # ==============================================================================
-st.set_page_config(page_title="Control de Escrutinio ONPE", layout="wide")
+st.set_page_config(page_title="Control de Escrutinio ONPE - Final", layout="wide")
 
 st.markdown(
     """
@@ -64,7 +64,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-# Título Principal alineado al lenguaje oficial
+# Título Principal alineado al lenguaje oficial de cierre de cómputo
 st.markdown(
     """
     <div style="margin-bottom: 20px; text-align: left;">
@@ -72,7 +72,7 @@ st.markdown(
             Elección de Fórmula Presidencial
         </h1>
         <p style="font-size: 15px; color: #64748B; margin-top: 0px; font-weight: 500;">
-            Segunda Vuelta Electoral 2026 — Monitoreo de Datos Macroeconómicos y Reglas del Juego Escrutadas
+            Segunda Vuelta Electoral 2026 — Cómputo Final al 100% de Actas Contabilizadas
         </p>
     </div>
     """, 
@@ -104,21 +104,21 @@ def consumir_api_onpe(url):
 json_data, status_msg = consumir_api_onpe(ONPE_API_REAL)
 
 # ==============================================================================
-# 2. PARAMETRIZACIÓN NOMINAL FIJADA (DATA VECTOR COHERENTE CON IMAGE_D93621.JPG)
+# 2. PARAMETRIZACIÓN NOMINAL FIJADA (DATA VECTOR COHERENTE CON IMAGE_643F73.JPG)
 # ==============================================================================
 total_actas = 92766
-procesadas_porc = 99.880      
-observadas_jee = 111         
-actas_contabilizadas = 92655  
+procesadas_porc = 100.000      
+observadas_jee = 0         
+actas_contabilizadas = 92766  
 actas_pendientes = 0       
-corte_temporal = "26/06/2026 A LAS 07:50:25 a. m."  
+corte_temporal = "29/06/2026 A LAS 03:10:26 p. m."  
 
 candidatos = [
-    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9209041, "porcentaje": 50.121, "color": "#F15A24"}, 
-    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9164453, "porcentaje": 49.879, "color": "#009245"} 
+    {"nombre": "KEIKO SOFÍA FUJIMORI HIGUCHI", "partido": "FUERZA POPULAR", "votos": 9223396, "porcentaje": 50.135, "color": "#F15A24"}, 
+    {"nombre": "ROBERTO HELBERT SÁNCHEZ PALOMINO", "partido": "JUNTOS POR EL PERÚ", "votos": 9173755, "porcentaje": 49.865, "color": "#009245"} 
 ]
 
-jee_porc = 0.120  
+jee_porc = 0.000  
 pendiente_porc = 0.000
 
 # Inicialización y actualización de la Serie de Tiempo Consolidada Diaria
@@ -136,13 +136,14 @@ if "registro_historico" not in st.session_state:
         {"Día": "23/06", "Keiko": 9190889, "Roberto": 9150289, "Diferencia Absoluta": 40600, "Actas JEE": 263, "Porcentaje Faltante": 0.284, "Observación": ""},
         {"Día": "24/06", "Keiko": 9206241, "Roberto": 9162855, "Diferencia Absoluta": 43386, "Actas JEE": 131, "Porcentaje Faltante": 0.141, "Observación": ""},
         {"Día": "25/06", "Keiko": 9208624, "Roberto": 9164171, "Diferencia Absoluta": 44453, "Actas JEE": 114, "Porcentaje Faltante": 0.123, "Observación": ""},
-        {"Día": "26/06", "Keiko": 9209041, "Roberto": 9164453, "Diferencia Absoluta": 44588, "Actas JEE": 111, "Porcentaje Faltante": jee_porc, "Observación": "Corte 07:50:25 a. m."}
+        {"Día": "26/06", "Keiko": 9209041, "Roberto": 9164453, "Diferencia Absoluta": 44588, "Actas JEE": 111, "Porcentaje Faltante": 0.120, "Observación": ""},
+        {"Día": "29/06", "Keiko": 9223396, "Roberto": 9173755, "Diferencia Absoluta": 49641, "Actas JEE": 0, "Porcentaje Faltante": 0.000, "Observación": "Cierre 100%"}
     ])
 
 if status_msg == "OK" and json_data:
     try:
-        procesadas_porc = float(json_data.get("porcentajepros", 99.880))
-        observadas_jee = int(json_data.get("totales_observadas", 111))
+        procesadas_porc = float(json_data.get("porcentajepros", 100.000))
+        observadas_jee = int(json_data.get("totales_observadas", 0))
         lista_api = json_data.get("resumen", json_data.get("candidatos", []))
         
         if lista_api and len(lista_api) >= 2:
@@ -156,12 +157,12 @@ if status_msg == "OK" and json_data:
             jee_porc = (observadas_jee / total_actas) * 100
             
             df_actual = st.session_state.registro_historico
-            df_actual.loc[df_actual["Día"] == "26/06", "Keiko"] = votos_k
-            df_actual.loc[df_actual["Día"] == "26/06", "Roberto"] = votos_r
-            df_actual.loc[df_actual["Día"] == "26/06", "Diferencia Absoluta"] = abs(votos_k - votos_r)
-            df_actual.loc[df_actual["Día"] == "26/06", "Actas JEE"] = observadas_jee
-            df_actual.loc[df_actual["Día"] == "26/06", "Porcentaje Faltante"] = round(jee_porc, 3)
-            df_actual.loc[df_actual["Día"] == "26/06", "Observación"] = f"Corte Dinámico: {datetime.datetime.now().strftime('%H:%M:%S')}"
+            df_actual.loc[df_actual["Día"] == "29/06", "Keiko"] = votos_k
+            df_actual.loc[df_actual["Día"] == "29/06", "Roberto"] = votos_r
+            df_actual.loc[df_actual["Día"] == "29/06", "Diferencia Absoluta"] = abs(votos_k - votos_r)
+            df_actual.loc[df_actual["Día"] == "29/06", "Actas JEE"] = observadas_jee
+            df_actual.loc[df_actual["Día"] == "29/06", "Porcentaje Faltante"] = round(jee_porc, 3)
+            df_actual.loc[df_actual["Día"] == "29/06", "Observación"] = f"Dinámico: {datetime.datetime.now().strftime('%H:%M:%S')}"
             st.session_state.registro_historico = df_actual
     except Exception as e:
         st.sidebar.error(f"Error de parsing: {str(e)}")
@@ -176,7 +177,7 @@ st.sidebar.info(f"Fijación Base: {corte_temporal}")
 def mapear_anotacion(row):
     base = f"{row['Diferencia Absoluta']:,}"
     if row["Observación"]:
-        return f"{base}<br><span style='font-size:10px; font-weight:bold; color:#002C6C;'>⚠️ {row['Observación']}</span>"
+        return f"{base}<br><span style='font-size:10px; font-weight:bold; color:#002C6C;'>🏁 {row['Observación']}</span>"
     return base
 
 st.session_state.registro_historico["Etiqueta_Grafico"] = st.session_state.registro_historico.apply(mapear_anotacion, axis=1)
@@ -234,7 +235,7 @@ with col_izq:
                 <span style="font-size: 11px; font-weight: 800; color: {candidatos[0]['color']}; letter-spacing: 1px; border: 1px solid {candidatos[0]['color']}; padding: 2px 8px; border-radius: 4px;">
                     {candidatos[0]['partido']}
                 </span>
-                <span style="font-size: 12px; font-weight: bold; color: #166534; background-color: #DCFCE7; padding: 2px 10px; border-radius: 9999px;">Ganador</span>
+                <span style="font-size: 12px; font-weight: bold; color: #166534; background-color: #DCFCE7; padding: 2px 10px; border-radius: 9999px;">Matemáticamente Irreversible</span>
             </div>
             <h2 style="font-size: 24px; margin: 15px 0 5px 0; color: #0F172A;">{candidatos[0]['nombre']}</h2>
             <div style="font-size: 56px; font-weight: 800; color: #002C6C; font-family: 'Arial', sans-serif; line-height: 1;">
@@ -256,7 +257,7 @@ with col_der:
                 <span style="font-size: 11px; font-weight: 800; color: {candidatos[1]['color']}; letter-spacing: 1px; border: 1px solid {candidatos[1]['color']}; padding: 2px 8px; border-radius: 4px;">
                     {candidatos[1]['partido']}
                 </span>
-                <span style="font-size: 12px; font-weight: bold; color: #991B1B; background-color: #FEE2E2; padding: 2px 10px; border-radius: 9999px;">Perdedor</span>
+                <span style="font-size: 12px; font-weight: bold; color: #991B1B; background-color: #FEE2E2; padding: 2px 10px; border-radius: 9999px;">Segundo Lugar</span>
             </div>
             <h2 style="font-size: 24px; margin: 15px 0 5px 0; color: #0F172A;">{candidatos[1]['nombre']}</h2>
             <div style="font-size: 56px; font-weight: 800; color: #002C6C; font-family: 'Arial', sans-serif; line-height: 1;">
@@ -273,9 +274,9 @@ with col_der:
 st.markdown(
     f"""
     <div style="background-color: #F0FDF4; border: 1px solid #BBF7D0; padding: 20px; border-radius: 8px; text-align: center; margin-bottom: 25px;">
-        <span style="font-size: 12px; font-weight: bold; color: #15803D; letter-spacing: 0.5px; text-transform: uppercase;">Ventaja Absoluta del Primer Lugar</span>
+        <span style="font-size: 12px; font-weight: bold; color: #15803D; letter-spacing: 0.5px; text-transform: uppercase;">Diferencia Absoluta Consolidada</span>
         <div style="font-size: 38px; font-weight: 800; color: #166534; font-family: 'Arial', sans-serif; margin-top: 2px;">
-            {diferencia_actual:,} <span style="font-size: 18px; font-weight: 500; color: #15803D;">Votos netos de separación</span>
+            {diferencia_actual:,} <span style="font-size: 18px; font-weight: 500; color: #15803D;">Votos netos finales de separación</span>
         </div>
     </div>
     """,
@@ -295,14 +296,14 @@ plotly_layout_defaults = dict(
 )
 
 with col_g1:
-    st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📈 Evolución Histórica de la Diferencia Absoluta (Dato por Día Acumulado)</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📈 Evolución Histórica de la Diferencia Absoluta (Cierre de Brecha)</p>", unsafe_allow_html=True)
     fig_linea_diff = px.line(st.session_state.registro_historico, x="Día", y="Diferencia Absoluta", markers=True, text="Etiqueta_Grafico")
     fig_linea_diff.update_traces(line_color="#002C6C", line_width=4, textposition="top center", marker=dict(size=10, line=dict(width=2, color='white'), color="#F15A24"))  
     fig_linea_diff.update_layout(**plotly_layout_defaults, margin=dict(t=35, b=15, l=15, r=15), height=340, xaxis=dict(type='category', gridcolor='#F1F5F9'), yaxis=dict(gridcolor='#F1F5F9'))
     st.plotly_chart(fig_linea_diff, use_container_width=True)
 
 with col_g2:
-    st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📉 Composición Porcentual del Espectro Válido</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📉 Composición Porcentual Definitiva del Espectro Válido</p>", unsafe_allow_html=True)
     df_pie = pd.DataFrame({"Candidato": [candidatos[0]["nombre"], candidatos[1]["nombre"]], "Votos": [candidatos[0]["votos"], candidatos[1]["votos"]]})
     fig_pie = px.pie(df_pie, values="Votos", names="Candidato", hole=0.5, color_discrete_sequence=[candidatos[0]["color"], candidatos[1]["color"]])
     fig_pie.update_traces(texttemplate="<b>%{percent:.3%}</b><br>%{value:,} votos", textfont_size=12, marker=dict(line=dict(color='#FFFFFF', width=2)))
@@ -312,14 +313,14 @@ with col_g2:
 col_c1, col_c2 = st.columns(2)
 
 with col_c1:
-    st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📂 Desembalse Operativo: Curva de Actas en el JEE por Jornada</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📂 Desembalse Operativo Completado: Curva de Actas en el JEE a Cero</p>", unsafe_allow_html=True)
     fig_jee = px.line(st.session_state.registro_historico, x="Día", y="Actas JEE", markers=True, text="Actas JEE")
     fig_jee.update_traces(line_color="#38BDF8", line_width=3, textposition="top center", marker=dict(size=8, color="#002C6C"))
     fig_jee.update_layout(**plotly_layout_defaults, margin=dict(t=25, b=15, l=15, r=15), height=280, xaxis=dict(type='category', gridcolor='#F1F5F9'), yaxis=dict(gridcolor='#F1F5F9'))
     st.plotly_chart(fig_jee, use_container_width=True)
 
 with col_c2:
-    st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📉 Umbral Regulatorio: % Pendiente de Resolución Total</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 14px; font-weight: bold; color:#0F172A; margin-bottom: 5px;'>📉 Umbral Regulatorio Concluido: 0.000% Pendiente de Resolución</p>", unsafe_allow_html=True)
     fig_faltante = px.area(st.session_state.registro_historico, x="Día", y="Porcentaje Faltante", markers=True, text="Porcentaje Faltante")
     fig_faltante.update_traces(line_color="#64748B", texttemplate="<b>%{text:.3f}%</b>", textposition="top center", marker=dict(size=8, color="#002C6C"))
     fig_faltante.update_layout(**plotly_layout_defaults, margin=dict(t=25, b=15, l=15, r=15), height=280, xaxis=dict(type='category', gridcolor='#F1F5F9'), yaxis=dict(gridcolor='#F1F5F9'))
@@ -335,7 +336,7 @@ st.markdown("<h3 style='text-align: center; color: #002C6C; margin-bottom: 2px;'
 st.markdown(
     """
     <p style='text-align: center; font-size: 14px; color: #475569; margin-top: 6px; font-weight: 500; max-width: 750px; margin-left: auto; margin-right: auto; line-height: 1.5;'>
-        Sé que mirar los resultados oficiales te estresa por lo lento que son, así que ¿por qué no te tomas un minuto, te diviertes con este juego y luego vas por un café? ☕<br>
+        ¡Cómputo cerrado al 100%! El escrutinio terminó. Si los gráficos ya no se mueven, relájate un momento con el juego antes de pasar a tu siguiente reporte. ☕<br>
         <span style='font-size: 12px; color: #94A3B8; font-weight: bold;'>[ Control: Presiona la barra espaciadora o haz clic dentro del cuadro para saltar las vallas ]</span>
     </p>
     """, 
